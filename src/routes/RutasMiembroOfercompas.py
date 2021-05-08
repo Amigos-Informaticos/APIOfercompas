@@ -25,8 +25,8 @@ def registrar_miembro():
 					"email": miembro.email,
 					"contrasenia": miembro.contrasenia,
 					"nickname": miembro.nickname,
-					"estaActivo": miembro.estaActivo,
-					"esModerador": miembro.esModerador
+					"estaActivo": miembro.estado,
+					"esModerador": miembro.tipoMiembro
 				}),
 				status=201,
 				mimetype="application/json"
@@ -36,3 +36,5 @@ def registrar_miembro():
 		elif resultado == 2:
 			respuesta = Response(status=500)
 	return respuesta
+
+
