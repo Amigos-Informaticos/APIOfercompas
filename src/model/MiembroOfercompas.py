@@ -83,3 +83,4 @@ class MiembroOfercompas(Base, Conexion):
     # def actualizar_miembro(self):
     # conexion: Session = MiembroOfercompas.abrir_conexion()
     #holi
+    #fdfd
