@@ -16,9 +16,23 @@ paths:
       parameters:
         - name: numeroPagina
           in: query
-          required: true
+          required: false
           schema:
             type: integer
+            minimum: 1
+        - name: categoria
+          in: query
+          required: false
+          schema:
+            type: string
+            minLength: 1
+            maxLength: 20
+        - name: calificacionMinima
+          in: query
+          required: false
+          schema:
+            type: integer
+
       responses:
         '200':
             description: Un arreglo JSon de Ofertas
@@ -85,18 +99,81 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
 
-    delete:
+    patch:
       summary: Elimina una oferta existente
       responses:
         '204':
           description: El recurso se eliminó con éxito
 
+  /miembros:
+    post:
+      summary: Registra un miembroOfercompas en la comunidad
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MiembroOfercompasSchema'
+      responses:
+        '201':
+          description: Una representación JSON del miembroOfercompasRegistrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MiembroOfercompasSchema'
+        '400':
+            $ref: '#/components/responses/BadRequest'
+
+  /miembros/{idMiembro}:
+    put:
+      summary: Actualiza un Miembro Ofercompas existente
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MiembroOfercompasSchema'
+      responses:
+        '200':
+          description: Una representación JSON del Miembro Ofercompas
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MiembroOfercompasSchema'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    patch:
+      summary: Cambia el atributo estaActivo de un miembroOfercompas a false
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MiembroOfercompasSchema'
+      responses:
+        '200':
+          description: Una representación JSON del Miembro Ofercompas
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MiembroOfercompasSchema'
+        '404':
+          $ref: '#/components/responses/NotFound'
 
 
 components:
   responses:
+    Success:
+      description: Solicitud realizada con exito
+
     NotFound:
       description: No se encontró el recurso especificado
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    BadRequest:
+      description: El servidor no pudo interpretar la solicitud, sintaxis invalida
       content:
         application/json:
           schema:
@@ -154,3 +231,22 @@ components:
             - viaje
             - entretenimiento
             - comidaBebida
+    MiembroOfercompasSchema:
+      type: object
+      required:
+        - nickname
+        - email
+        - contrasenia
+        - estaActivo
+        - esModerador
+      properties:
+        nickname:
+          type: string
+        email:
+          type: string
+        contraenia:
+          type: string
+        estaActivo:
+          type: boolean
+        esModerador:
+          type: boolean
