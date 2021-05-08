@@ -1,15 +1,11 @@
-import sqlalchemy
 from sqlalchemy import Column, String, Integer, Boolean
 from sqlalchemy.exc import SQLAlchemyError
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, relationship
 
 from src.model.Conexion import Conexion
 
-Base = declarative_base()
 
-
-class MiembroOfercompas(Base, Conexion):
+class MiembroOfercompas(Conexion):
 	__tablename__ = "Miembro"
 
 	idMiembro: Column = Column(Integer(), primary_key=True, nullable=False)
@@ -18,6 +14,7 @@ class MiembroOfercompas(Base, Conexion):
 	contrasenia: Column = Column(String(20), nullable=False)
 	estaActivo: Column = Column(Boolean(), nullable=False, default=True)
 	esModerador: Column = Column(Boolean(), nullable=False, default=False)
+	referenciaPublicaciones = relationship("Publicacion", back_populates="referencia")
 
 	def __init__(self, id_miembro: int = None, nickname: str = None, email: str = None, contrasenia: str = None,
 				 esta_activo: bool = True,

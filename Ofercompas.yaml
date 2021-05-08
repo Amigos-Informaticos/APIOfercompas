@@ -2,10 +2,9 @@ openapi: 3.0.0
 info:
   version: '1.0'
   title: OfercompasAPI
-  description: API para el servicio de Ofercompas
+  description: API para el servicio de Ofercompas, un sistema para la publicacion de ofertas de ECommerce
 
 servers:
-  # Added by API Auto Mocking Plugin
   - description: SwaggerHub API Auto Mocking
     url: https://virtserver.swaggerhub.com/EfrainCami/Ofercompas/1.0
 
@@ -16,9 +15,23 @@ paths:
       parameters:
         - name: numeroPagina
           in: query
-          required: true
+          required: false
           schema:
             type: integer
+            minimum: 1
+        - name: categoria
+          in: query
+          required: false
+          schema:
+            type: string
+            minLength: 1
+            maxLength: 20
+        - name: calificacionMinima
+          in: query
+          required: false
+          schema:
+            type: integer
+
       responses:
         '200':
             description: Un arreglo JSon de Ofertas
@@ -85,18 +98,81 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
 
-    delete:
+    patch:
       summary: Elimina una oferta existente
       responses:
         '204':
           description: El recurso se eliminó con éxito
 
+  /comunidad:
+    post:
+      summary: Registra un miembroOfercompas en la comunidad
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MiembroOfercompasSchema'
+      responses:
+        '201':
+          description: Una representación JSON del miembroOfercompasRegistrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MiembroOfercompasSchema'
+        '400':
+            $ref: '#/components/responses/BadRequest' #En todos los post potencialmente
+
+  /comunidad/{idMiembro}:
+    put:
+      summary: Actualiza un Miembro Ofercompas existente
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MiembroOfercompasSchema'
+      responses:
+        '200':
+          description: Una representación JSON del Miembro Ofercompas
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MiembroOfercompasSchema'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    patch:
+      summary: Cambia el atributo estaActivo de un miembroOfercompas a false
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MiembroOfercompasSchema'
+      responses:
+        '200':
+          description: Una representación JSON del Miembro Ofercompas
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MiembroOfercompasSchema'
+        '404':
+          $ref: '#/components/responses/NotFound'
 
 
 components:
   responses:
+    Success:
+      description: Solicitud realizada con exito
+
     NotFound:
       description: No se encontró el recurso especificado
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    BadRequest:
+      description: El servidor no pudo interpretar la solicitud, sintaxis invalida
       content:
         application/json:
           schema:
@@ -107,10 +183,10 @@ components:
       type: object
       properties:
         error:
-          type: string
+          type: string #500, 500, 503 al servidor
 
 
-    OfertaSchema:
+    OfertaSchema: #Considerar agregar examples
       type: object
       required:
         - titulo
@@ -124,18 +200,19 @@ components:
         - categoria
       properties:
         titulo:
-          type: string
           description: Titulo de la oferta
+          type: string
+          example: Raspberry Pi Model 3B+
         descripcion:
           type: string
         precio:
-          type: integer
+          type: integer #Objeto moneda ([int,int,currency])
           format: float
         vinculo:
           type: string
         puntuacion:
           type: integer
-        foto:
+        foto: #Investigar media types
           type: string
           format: binary
         video:
@@ -145,7 +222,7 @@ components:
           type: boolean
         categoria:
           type: string
-          enum:
+          enum: #Cambiar a upper snake case
             - tecnologia
             - modaMujer
             - modaHombre
@@ -154,3 +231,23 @@ components:
             - viaje
             - entretenimiento
             - comidaBebida
+
+    MiembroOfercompasSchema:
+      type: object
+      required:
+        - nickname
+        - email
+        - contrasenia
+        - estaActivo
+        - esModerador
+      properties:
+        nickname:
+          type: string
+        email:
+          type: string
+        contraenia:
+          type: string
+        estaActivo:
+          type: boolean
+        esModerador:
+          type: boolean
