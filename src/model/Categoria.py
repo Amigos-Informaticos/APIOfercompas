@@ -2,7 +2,7 @@ from enum import Enum
 
 
 class Categoria(Enum):
-	tecnoloia = 1
+	TECNOLOGIA = 1
 	modaMujer = 2
 	modaHombre = 3
 	hogar = 4
