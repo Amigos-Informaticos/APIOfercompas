@@ -124,7 +124,7 @@ paths:
         '400':
             $ref: '#/components/responses/BadRequest'
 
-  /miembros/{idMiembro}:
+  /miembros/{emailMiembro}:
     put:
       summary: Actualiza un Miembro Ofercompas existente
       requestBody:
