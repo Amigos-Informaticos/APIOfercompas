@@ -1,21 +1,22 @@
 from sqlalchemy import Column, String, Integer
 from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import Session
 
-from src.model.Conexion import Conexion
-from src.model.EstadoMiembro import EstadoMiembro
-from src.model.TipoMiembro import TipoMiembro
+from src.datos.Conexion import Conexion
+from src.negocio.EstadoMiembro import EstadoMiembro
+from src.negocio.TipoMiembro import TipoMiembro
+
+Base = declarative_base()
 
 
-class MiembroOfercompas(Conexion):
+class MiembroOfercompas(Base, Conexion):
     __tablename__ = "MiembroOfercompas"
 
     idMiembro: Column = Column(Integer(), primary_key=True, nullable=False)
     nickname: Column = Column(String(20), nullable=False, unique=True)
     email: Column = Column(String(320), nullable=False, unique=True)
     contrasenia: Column = Column(String(20), nullable=False)
-    estado: Column = Column(Integer(), nullable=False, default=EstadoMiembro.activo)
-    tipoMiembro: Column = Column(Integer(), nullable=False, default=TipoMiembro.comun)
 
     def __init__(self, id_miembro: int = None, nickname: str = None, email: str = None, contrasenia: str = None,
                  estado: EstadoMiembro = 1, tipo_miembro: TipoMiembro = 1):
@@ -76,7 +77,22 @@ class MiembroOfercompas(Conexion):
         self.contrasenia = miembro.contrasenia
         self.nickname = miembro.nickname
 
-# def actualizar_miembro(self):
-# conexion: Session = MiembroOfercompas.abrir_conexion()
-# holi
-# fdfd
+    def actualizar_miembro(self, old_email: str):
+        actualizado = 1
+        try:
+            conexion: Session = MiembroOfercompas.abrir_conexion()
+            miembro: MiembroOfercompas = conexion.query(MiembroOfercompas).filter_by(email=old_email).first()
+            if miembro is not None:
+                miembro.nickname = self.nickname
+                miembro.contrasenia = self.contrasenia
+                miembro.email = self.email
+                self.idMiembro = miembro.idMiembro
+                conexion.commit()
+                actualizado = 0
+            else:
+                actualizado = 3 # miembro no existe en bd
+        except SQLAlchemyError as sql_error:
+            actualizado = 2
+            print(sql_error)
+
+        return actualizado

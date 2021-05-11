@@ -2,9 +2,10 @@ openapi: 3.0.0
 info:
   version: '1.0'
   title: OfercompasAPI
-  description: API para el servicio de Ofercompas, un sistema para la publicacion de ofertas de ECommerce
+  description: API para el servicio de Ofercompas
 
 servers:
+  # Added by API Auto Mocking Plugin
   - description: SwaggerHub API Auto Mocking
     url: https://virtserver.swaggerhub.com/EfrainCami/Ofercompas/1.0
 
@@ -40,7 +41,7 @@ paths:
                 schema:
                   type: object
                   properties:
-                    ofertas: #hacer en ref
+                    pedidos:
                       type: array
                       items:
                         $ref: '#/components/schemas/OfertaSchema'
@@ -104,7 +105,7 @@ paths:
         '204':
           description: El recurso se eliminó con éxito
 
-  /comunidad:
+  /miembros:
     post:
       summary: Registra un miembroOfercompas en la comunidad
       requestBody:
@@ -121,9 +122,9 @@ paths:
               schema:
                 $ref: '#/components/schemas/MiembroOfercompasSchema'
         '400':
-            $ref: '#/components/responses/BadRequest' #En todos los post potencialmente
+            $ref: '#/components/responses/BadRequest'
 
-  /comunidad/{idMiembro}:
+  /miembros/{emailMiembro}:
     put:
       summary: Actualiza un Miembro Ofercompas existente
       requestBody:
@@ -183,10 +184,10 @@ components:
       type: object
       properties:
         error:
-          type: string #500, 500, 503 al servidor
+          type: string
 
 
-    OfertaSchema: #Considerar agregar examples
+    OfertaSchema:
       type: object
       required:
         - titulo
@@ -200,19 +201,18 @@ components:
         - categoria
       properties:
         titulo:
-          description: Titulo de la oferta
           type: string
-          example: Raspberry Pi Model 3B+
+          description: Titulo de la oferta
         descripcion:
           type: string
         precio:
-          type: integer #Objeto moneda ([int,int,currency])
+          type: integer
           format: float
         vinculo:
           type: string
         puntuacion:
           type: integer
-        foto: #Investigar media types
+        foto:
           type: string
           format: binary
         video:
@@ -222,7 +222,7 @@ components:
           type: boolean
         categoria:
           type: string
-          enum: #Cambiar a upper snake case
+          enum:
             - tecnologia
             - modaMujer
             - modaHombre
@@ -231,7 +231,6 @@ components:
             - viaje
             - entretenimiento
             - comidaBebida
-
     MiembroOfercompasSchema:
       type: object
       required:
