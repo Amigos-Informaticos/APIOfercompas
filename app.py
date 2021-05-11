@@ -1,6 +1,6 @@
 from flask import Flask
 
-from src.routes.RutasMiembroOfercompas import rutas_miembro
+from src.servicios.RutasMiembroOfercompas import rutas_miembro
 
 app = Flask(__name__)
 
