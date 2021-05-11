@@ -186,67 +186,107 @@ components:
         error:
           type: string
 
-
-    OfertaSchema:
+    PublicacionSchema:
       type: object
       required:
         - titulo
         - descripcion
-        - precio
-        - vinculo
         - puntuacion
-        - foto
-        - video
-        - estaActivo
+        - estadoPublicacion
         - categoria
       properties:
         titulo:
           type: string
           description: Titulo de la oferta
+          example: Raspberry pi 3 firmada por Efra
         descripcion:
           type: string
-        precio:
-          type: integer
-          format: float
-        vinculo:
-          type: string
+          description: Descripcion de la publicacion
+          example: Una raspberry pi firmada por Efrain Roblox Pro Player
         puntuacion:
           type: integer
-        foto:
+          description: Pustuacion de la publicacion
+          minimum: -999
+          maximum: 999
+          example: 12
+        estadoPublicacion:
           type: string
-          format: binary
-        video:
-          type: string
-          format: binary
-        estaActivo:
-          type: boolean
+          enum:
+            - ACTIVA
+            - TERMINADA
+            - PROHIBIDA
+            - ELIMINADA
         categoria:
           type: string
           enum:
-            - tecnologia
-            - modaMujer
-            - modaHombre
-            - hogar
-            - mascotas
-            - viaje
-            - entretenimiento
-            - comidaBebida
+            - TECNOLOGIA
+            - MODA_MUJER
+            - MODA_HOMBRE
+            - HOGAR
+            - MASCOTAS
+            - VIAJE
+            - ENTRETENIMIENTO
+            - COMIDA_BEBIDA
+
+    OfertaSchema:
+      allOf:
+        - $ref: '#/components/schemas/PublicacionSchema'
+        - type: object
+          required:
+            - precio
+            - vinculo
+          properties:
+            precio:
+              type: integer
+              description: Precio en pesos del producto incluyendo centavos
+              format: float
+              example: 500.50
+            vinculo:
+              type: string
+              description: Link que lleva al sitio de la oferta
+              example: https://articulo.mercadolibre.com.mx/MLM-756165002-raspberry-pi4-4gb-case-ventilador-sd-32gb-hdmi-pi-4-b-kit
+
+
+
+
     MiembroOfercompasSchema:
       type: object
       required:
         - nickname
         - email
         - contrasenia
-        - estaActivo
-        - esModerador
+        - estadoMiembro
+        - tipoMiembro
       properties:
         nickname:
           type: string
+          description: Nombre identificador unico de cada Miembro
+          example: YiraPvP
         email:
           type: string
+          format: email
+          description: Correo electronico del miembro
+          example: rendon.luisgerardo@gmail.com
         contraenia:
           type: string
-        estaActivo:
-          type: boolean
-        esModerador:
-          type: boolean
+          description: Contrasenia de acceso del usuario
+          example: YiraTheBest
+        estadoMiembro:
+          type: string
+          description: Posibles estados que toma el Miembro en el sistema
+          enum:
+            - ACTIVO
+            - EXPULSADO
+            - ELIMINADO
+          example: ACTIVO
+        tipoMiembro:
+          type: string
+          description: Los tipos de roles que un Miembro puede cumplir en el sistema
+          enum:
+            - COMUN
+            - MODERADOR
+            - ADMINISTRADOR
+          example: COMUN
+
+    DenunciaSchema:
+
