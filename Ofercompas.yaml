@@ -91,7 +91,7 @@ paths:
           schema:
             type: integer
             format: int32
-            minimun: 1
+            minimum: 1
           required: true
       responses:
         '200':
@@ -116,7 +116,7 @@ paths:
           schema:
             type: integer
             format: int32
-            minimun: 1
+            minimum: 1
           required: true
       requestBody:
         required: true
@@ -145,7 +145,7 @@ paths:
           schema:
             type: integer
             format: int32
-            minimun: 1
+            minimum: 1
           required: true
       responses:
         '204':
@@ -173,7 +173,7 @@ paths:
                 minimun: 1
               required: true
               example: 5
-            - name: id_publicacion
+            - name:  numeroPagina
               description: El número de página que indica si traerá los primeros 10 en caso de ser 1
               in: query
               schema:
@@ -197,10 +197,7 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
 
-    post:
-      summary: Publica una denuncia para una publicacion
-      tags:
-        - Denuncias
+
 
 
   /codigos:
@@ -238,7 +235,7 @@ paths:
             schema:
               type: integer
               format: int32
-              minimun: 1
+              minimum: 1
             required: true
         responses:
           '200':
@@ -292,7 +289,7 @@ paths:
             schema:
               type: integer
               format: int32
-              minimun: 1
+              minimum: 1
             required: true
         responses:
           '204':
@@ -304,9 +301,7 @@ paths:
 
 
 
-  /codigos/{idCodigo}/denuncias:
 
-  /codigos/{idCodigo}/denuncias/{numeroPagina}:
 
 
 
