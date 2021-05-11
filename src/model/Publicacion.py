@@ -1,6 +1,7 @@
 from sqlalchemy import Column, Integer, String, Date, ForeignKey
 from sqlalchemy.orm import relationship, Session
 
+from src.model import EstadoPublicacion
 from src.model.Conexion import Conexion
 
 
@@ -21,7 +22,7 @@ class Publicacion(Conexion):
 		self.idPublicacion = 0
 		self.titulo = None
 		self.descripcion = None
-		self.estado = 1
+		self.estado = EstadoPublicacion.ACTIVO
 		self.fechaCreacion = None
 		self.fechaCreacion = None
 		self.publicador = None
@@ -33,3 +34,4 @@ class Publicacion(Conexion):
 		).scalar()
 		conexion.close()
 		return repetido
+

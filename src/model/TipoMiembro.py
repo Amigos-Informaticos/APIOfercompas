@@ -2,6 +2,6 @@ from enum import Enum
 
 
 class TipoMiembro(Enum):
-    comun = 1
-    moderador = 2
-    administrador = 3
+    COMUN = 1
+    MODERADOR = 2
+    ADMINISTRAR = 3

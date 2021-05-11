@@ -1,28 +1,24 @@
-import sqlalchemy
-from sqlalchemy import Column, String, Integer, Boolean
+from sqlalchemy import Column, String, Integer
 from sqlalchemy.exc import SQLAlchemyError
-from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import Session
 
 from src.model.Conexion import Conexion
 from src.model.EstadoMiembro import EstadoMiembro
 from src.model.TipoMiembro import TipoMiembro
 
-Base = declarative_base()
 
-
-class MiembroOfercompas(Base, Conexion):
+class MiembroOfercompas(Conexion):
     __tablename__ = "MiembroOfercompas"
 
     idMiembro: Column = Column(Integer(), primary_key=True, nullable=False)
     nickname: Column = Column(String(20), nullable=False, unique=True)
     email: Column = Column(String(320), nullable=False, unique=True)
     contrasenia: Column = Column(String(20), nullable=False)
-    estado: Column = Column(String(20), nullable=False, default=EstadoMiembro.activo)
-    tipoMiembro: Column = Column(String(20), nullable=False, default=TipoMiembro.comun)
+    estado: Column = Column(Integer(), nullable=False, default=EstadoMiembro.activo)
+    tipoMiembro: Column = Column(Integer(), nullable=False, default=TipoMiembro.comun)
 
     def __init__(self, id_miembro: int = None, nickname: str = None, email: str = None, contrasenia: str = None,
-                 estado: EstadoMiembro = EstadoMiembro.activo, tipo_miembro: TipoMiembro = TipoMiembro.comun):
+                 estado: EstadoMiembro = 1, tipo_miembro: TipoMiembro = 1):
         self.idMiembro = id_miembro
         self.nickname = nickname
         self.email = email
@@ -80,7 +76,7 @@ class MiembroOfercompas(Base, Conexion):
         self.contrasenia = miembro.contrasenia
         self.nickname = miembro.nickname
 
-    # def actualizar_miembro(self):
-    # conexion: Session = MiembroOfercompas.abrir_conexion()
-    #holi
-    #fdfd
+# def actualizar_miembro(self):
+# conexion: Session = MiembroOfercompas.abrir_conexion()
+# holi
+# fdfd

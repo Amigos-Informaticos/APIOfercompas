@@ -10,5 +10,5 @@ class Conexion(Base):
 
     @staticmethod
     def abrir_conexion() -> Session:
-        engine = create_engine("mysql+pymysql://amigo:beethoven@192.168.1.99/Ofercompas")
+        engine = create_engine("mysql+pymysql://amigo:beethoven@ofercompas.ddns.net/Ofercompas")
         return Session(engine)

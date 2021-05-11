@@ -40,7 +40,7 @@ paths:
                 schema:
                   type: object
                   properties:
-                    pedidos:
+                    ofertas: #hacer en ref
                       type: array
                       items:
                         $ref: '#/components/schemas/OfertaSchema'
