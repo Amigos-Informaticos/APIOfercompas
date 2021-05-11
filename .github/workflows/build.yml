@@ -23,11 +23,11 @@ jobs:
         uses: docker/setup-buildx-action@v1
 
       - name: Construir con buildx
-          run: |
-            docker buildx build \
-            --push \
-            --tag ${{ secrets.USER_NAME_GERARDO }}/api_ofercompas:latest \
-            --platform linux/386,linux/amd64,linux/arm/v6,linux/arm/v7,linux/arm64 .
+        run: |
+          docker buildx build \
+          --push \
+          --tag ${{ secrets.USER_NAME_GERARDO }}/api_ofercompas:latest \
+          --platform linux/386,linux/amd64,linux/arm/v6,linux/arm/v7,linux/arm64 .
 
 
 
