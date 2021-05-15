@@ -10,13 +10,15 @@ from src.negocio.TipoMiembro import TipoMiembro
 Base = declarative_base()
 
 
-class MiembroOfercompas(Base, Conexion):
+class MiembroOfercompas(Conexion):
     __tablename__ = "MiembroOfercompas"
 
     idMiembro: Column = Column(Integer(), primary_key=True, nullable=False)
     nickname: Column = Column(String(20), nullable=False, unique=True)
     email: Column = Column(String(320), nullable=False, unique=True)
     contrasenia: Column = Column(String(20), nullable=False)
+    estado: Column = Column(Integer(), nullable=False, unique=False)
+    tipoMiembro: Column = Column(Integer(), nullable=False, unique=False)
 
     def __init__(self, id_miembro: int = None, nickname: str = None, email: str = None, contrasenia: str = None,
                  estado: EstadoMiembro = 1, tipo_miembro: TipoMiembro = 1):
@@ -90,9 +92,43 @@ class MiembroOfercompas(Base, Conexion):
                 conexion.commit()
                 actualizado = 0
             else:
-                actualizado = 3 # miembro no existe en bd
+                actualizado = 3  # miembro no existe en bd
         except SQLAlchemyError as sql_error:
             actualizado = 2
             print(sql_error)
 
         return actualizado
+
+    def eliminar_miembro(self, id_miembro: int):
+        eliminado = 1
+        try:
+            conexion: Session = MiembroOfercompas.abrir_conexion()
+            miembro: MiembroOfercompas = conexion.query(MiembroOfercompas).filter_by(id=id_miembro).first()
+            if miembro is not None:
+                miembro.estado = 3
+                eliminado = 0
+                conexion.commit()
+            else:
+                eliminado = 3
+        except SQLAlchemyError as sql_error:
+            eliminado = 2
+            print(sql_error)
+
+        return eliminado
+
+    def expulsar_miembro(self, id_miembro: int):
+        expulsado = 1
+        try:
+            conexion: Session = MiembroOfercompas.abrir_conexion()
+            miembro: MiembroOfercompas = conexion.query(MiembroOfercompas).filter_by(id=id_miembro).first()
+            if miembro is not None:
+                miembro.estado = 2
+                expulsado = 0
+                conexion.commit()
+            else:
+                expulsado = 3
+        except SQLAlchemyError as sql_error:
+            expulsado = 2
+            print(sql_error)
+
+        return expulsado
