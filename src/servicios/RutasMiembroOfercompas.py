@@ -75,3 +75,19 @@ def actualizar_miembro(old_email):
     else:
         respuesta = Response(status=400)
     return  respuesta
+
+@rutas_miembro.route("/miembros",methods=["GET"])
+def getprueba():
+    respuesta = Response(
+        json.dumps({
+            "idMiembro": "Efrain",
+            "email": "Razziel",
+            "contrasenia": "Arenas",
+            "nickname": "Ramirez",
+            "estado": "Sexto",
+            "tipoMiembro": "Semestre"
+        }),
+        status=200,
+        mimetype="application/json"
+    )
+    return respuesta
