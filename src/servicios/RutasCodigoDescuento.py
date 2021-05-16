@@ -10,7 +10,6 @@ rutas_codigo = Blueprint("rutas_codigo", __name__)
 
 
 @rutas_codigo.route("/codigos", methods=["POST"])
-@Auth.requires_token
 def registrar_codigo():
     codigo_recibido = request.json
     valores_requeridos = {"titulo", "descripcion", "codigo", "fechaCreacion", "fechaFin", "publicador", "categoria"}
@@ -34,7 +33,8 @@ def registrar_codigo():
                         "descripcion": codigo_descuento.descripcion,
                         "fechaCreacion": codigo_descuento.fechaCreacion,
                         "fechaFin": codigo_descuento.fechaFin,
-                        "publicador": codigo_descuento.publicador
+                        "publicador": codigo_descuento.publicador,
+                        "codigo": codigo_descuento.codigo
                     }),
                     status=status,
                     mimetype="application/json"
@@ -50,7 +50,7 @@ def registrar_codigo():
 @rutas_codigo.route("/codigos/<idPublicacion>", methods=["PUT"])
 def actualizar_codigo(idPublicacion):
     codigo_recibido = request.json
-    valores_requeridos = {"titulo", "descripcion", "codigo", "fechaCreacion", "fechaFin", "categoria", "vinculo"}
+    valores_requeridos = {"titulo", "descripcion", "codigo", "fechaCreacion", "fechaFin", "categoria"}
     respuesta = Response(status=MALA_SOLICITUD)
     if codigo_recibido is not None:
         if all(llave in codigo_recibido for llave in valores_requeridos):
@@ -61,7 +61,6 @@ def actualizar_codigo(idPublicacion):
             codigo_descuento.fechaFin = codigo_recibido["fechaFin"]
             codigo_descuento.categoria = codigo_recibido["categoria"]
             codigo_descuento.codigo = codigo_recibido["codigo"]
-            codigo_descuento.vinculo = codigo_recibido["vinculo"]
             status = codigo_descuento.actualizar_codigo(idPublicacion)
             if status == RECURSO_CREADO:
                 respuesta = Response(

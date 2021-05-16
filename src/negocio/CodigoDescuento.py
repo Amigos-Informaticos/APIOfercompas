@@ -19,7 +19,7 @@ class CodigoDescuento(Publicacion):
     def registrar_codigo(self) -> int:
         respuesta = 500
         conexion = EasyConnection()
-        query = "CALL SPI_registrarCodigoDescuento (%s, %s, %s, %s, %s, %s, %s, %s)"
+        query = "CALL SPI_registrarCodigoDescuento (%s, %s, %s, %s, %s, %s, %s)"
         values = [self.titulo, self.descripcion, self.fechaCreacion, self.fechaFin, self.categoria,
                   self.codigo, self.publicador]
         if conexion.send_query(query, values):
@@ -34,7 +34,7 @@ class CodigoDescuento(Publicacion):
     def actualizar_codigo(self, id_publicacin: int) -> int:
         respuesta = 500
         conexion = EasyConnection()
-        query = "CALL SPA_actualizarCodigoDescuento(%s, %s, %s, %s, %s, %s, %s, %s)"
+        query = "CALL SPA_actualizarCodigoDescuento(%s, %s, %s, %s, %s, %s, %s)"
         values = [id_publicacin, self.titulo, self.descripcion, self.fechaCreacion,
                   self.fechaFin, self.categoria, self.codigo]
         if conexion.send_query(query, values):
