@@ -10,11 +10,11 @@ class Oferta(Publicacion):
         self.vinculo = None
         self.tipoPublicacion = "Oferta"
 
-    def convertir_a_json(self, atributos: list)->dict:
+    def convertir_a_json(self, atributos: list) -> dict:
         diccionario = {}
         for key in atributos:
             if key in self.__dict__.keys():
-                diccionario[key]=self.__getattribute__(key)
+                diccionario[key] = self.__getattribute__(key)
         return diccionario
 
     def registrar_oferta(self) -> int:
@@ -25,19 +25,6 @@ class Oferta(Publicacion):
                   self.vinculo, self.publicador]
         if conexion.send_query(query, values):
             respuesta = 201
-        else:
-            respuesta = 400
-
-        return respuesta
-
-    @staticmethod
-    def eliminar_oferta(id_publicacion: int) -> int:
-        respuesta = 500
-        conexion = EasyConnection()
-        query = "CALL SPA_eliminarOferta(%s)"
-        values = [id_publicacion]
-        if conexion.send_query(query, values):
-            respuesta = 204
         else:
             respuesta = 400
 

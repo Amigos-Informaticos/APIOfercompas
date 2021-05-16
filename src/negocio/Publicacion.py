@@ -16,15 +16,6 @@ class Publicacion:
         self.publicador = None
         self.categoria = 1
 
-    def estaRegistrada(self) -> bool:
-        pass
-
-    def registrar_publicacion(self) -> int:
-        pass
-
-    def obtener_por_autoria(self) -> int:
-        pass
-
     def obtener_id(self) -> int:
         id = None
         conexion = EasyConnection()
@@ -34,3 +25,16 @@ class Publicacion:
         if len(resultado) > 0:
             id = resultado[0][0]
         return id
+
+    @staticmethod
+    def eliminar_publicacion(id_publicacion: int) -> int:
+        respuesta = 500
+        conexion = EasyConnection()
+        query = "CALL SPA_eliminarPublicacion(%s)"
+        values = [id_publicacion]
+        if conexion.send_query(query, values):
+            respuesta = 204
+        else:
+            respuesta = 400
+
+        return respuesta
