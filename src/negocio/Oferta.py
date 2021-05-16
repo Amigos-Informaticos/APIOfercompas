@@ -20,19 +20,18 @@ class Oferta(Publicacion):
         super().__init__()
         self.precio = None
         self.vinculo = None
+        self.tipoPublicacion = "Oferta"
+        self.conexion = Oferta.abrir_conexion()
 
-    def registrar_oferta(self) -> int:
+
+    def registrar_oferta(self, id_publicacion: int) -> int:
         registrado = 409
         if not self.estaRegistrada():
             try:
-                id_publicacion = self.registrar_publicacion("Oferta")
-                if id_publicacion is not None:
-                    self.idPublicacion = id_publicacion
-                    self.conexion.add(self)
-                    self.conexion.commit()
-                    registrado = 201
-                else:
-                    registrado = 500
+                self.idPublicacion = id_publicacion
+                self.conexion.add(self)
+                self.conexion.commit()
+                registrado = 201
             except SQLAlchemyError as sql_error:
                 registrado = 500
                 print(sql_error)

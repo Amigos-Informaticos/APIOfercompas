@@ -1,5 +1,6 @@
 from sqlalchemy import Column, Integer, String, Date, ForeignKey
 from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.orm import relationship
 
 from src.negocio.Categoria import Categoria
 from src.datos.Conexion import Conexion
@@ -17,7 +18,8 @@ class Publicacion(Conexion):
     fechaFin: Column = Column(Date(), nullable=False)
     categoria: Column = Column(Integer(), ForeignKey("Categoria.idCategoria"), nullable=False)
     publicador: Column = Column(Integer(), ForeignKey("MiembroOfercompas.idMiembro"), nullable=False)
-    tipoPublicacion: Column = Column(String(10), nullable=False)
+    referenciaHijas = relationship("Oferta", backref="madre")
+    tipoPublicacion: Column = Column(String(20), nullable=False)
     __mapper_args__ = {
         "polymorphic_identity": "Publicacion",
         "polymorphic_on": tipoPublicacion}
@@ -28,7 +30,7 @@ class Publicacion(Conexion):
         self.descripcion = None
         self.estado = EstadoPublicacion.ACTIVA.value
         self.fechaCreacion = None
-        self.fechaCreacion = None
+        self.fechaFin = None
         self.publicador = None
         self.categoria = 1
         self.conexion = Publicacion.abrir_conexion()
@@ -37,20 +39,23 @@ class Publicacion(Conexion):
         repetido: bool = self.conexion.query(
             self.conexion.query(Publicacion).filter_by(titulo=self.titulo, descripcion=self.descripcion).exists()
         ).scalar()
-        self.conexion.close()
         return repetido
 
-    def registrar_publicacion(self, tipo_publicacion: str) -> int:
+    def registrar_publicacion(self) -> int:
         id = None
-        self.tipoPublicacion = tipo_publicacion
         if not self.estaRegistrada():
             try:
                 self.conexion.add(self)
                 self.conexion.commit()
+                id = self.obtener_por_autoria()
                 print(self.idPublicacion)
-                id = self.idPublicacion
             except SQLAlchemyError as sql_error:
                 print(sql_error)
             finally:
                 self.conexion.close()
         return id
+
+    def obtener_por_autoria(self) -> int:
+        publicacion_obtenida:Publicacion = self.conexion.query(Publicacion).filter_by(titulo=self.titulo, publicador=self.publicador).first()
+        return publicacion_obtenida.idPublicacion
+

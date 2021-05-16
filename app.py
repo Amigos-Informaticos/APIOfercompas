@@ -14,4 +14,5 @@ def hello_world():
 
 
 if __name__ == '__main__':
-    app.run()
+    print("Hola, Edson")
+    app.run(debug=True)
