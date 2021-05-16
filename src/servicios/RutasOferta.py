@@ -4,11 +4,13 @@ from flask import Blueprint, request, Response
 
 from src.negocio.CodigosRespuesta import MALA_SOLICITUD, RECURSO_CREADO, OK
 from src.negocio.Oferta import Oferta
+from src.servicios.Auth import Auth
 
 rutas_oferta = Blueprint("rutas_oferta", __name__)
 
 
 @rutas_oferta.route("/ofertas", methods=["POST"])
+@Auth.requires_token
 def registrar_oferta():
     oferta_recibida = request.json
     valores_requeridos = {"titulo", "descripcion", "precio", "fechaCreacion", "fechaFin", "publicador", "categoria"}
