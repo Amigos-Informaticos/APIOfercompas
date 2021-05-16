@@ -2,10 +2,8 @@ import json
 
 from flask import Blueprint, request, Response
 
-from src.negocio.CodigosRespuesta import MALA_SOLICITUD, RECURSO_CREADO, NO_ENCONTRADO
-from src.negocio.MiembroOfercompas import MiembroOfercompas
+from src.negocio.CodigosRespuesta import MALA_SOLICITUD, RECURSO_CREADO, OK
 from src.negocio.Oferta import Oferta
-from src.negocio.Publicacion import Publicacion
 
 rutas_oferta = Blueprint("rutas_oferta", __name__)
 
@@ -17,40 +15,69 @@ def registrar_oferta():
     respuesta = Response(status=MALA_SOLICITUD)
     if oferta_recibida is not None:
         if all(llave in oferta_recibida for llave in valores_requeridos):
-            miembro = MiembroOfercompas.obtener_con_id(oferta_recibida["publicador"])
-            publicacion = Publicacion()
-            publicacion.titulo = oferta_recibida["titulo"]
-            publicacion.descripcion = oferta_recibida["descripcion"]
-            publicacion.fechaCreacion = oferta_recibida["fechaCreacion"]
-            publicacion.fechaFin = oferta_recibida["fechaFin"]
-            publicacion.categoria = oferta_recibida["categoria"]
-            publicacion.publicador = oferta_recibida["publicador"]
-            publicacion.autor = miembro
-            publicacion.__mapper_args__["polymorphic_identity"] = "Oferta"
-            id_publicacion = publicacion.registrar_publicacion()
-            print(id_publicacion)
-            if miembro is not None and id_publicacion is not None:
-                oferta = Oferta()
-                oferta.precio = oferta_recibida["precio"]
-                status = oferta.registrar_oferta(id_publicacion)
-                if status == RECURSO_CREADO:
-                    respuesta = Response(
-                        json.dumps({
-                            "idPublicacion": publicacion.idPublicacion,
-                            "titulo": publicacion.titulo,
-                            "descripcion": publicacion.descripcion,
-                            "fechaCreacion": publicacion.fechaCreacion,
-                            "fechaFin": publicacion.fechaFin,
-                            "publicador": publicacion.publicador
-                        }),
-                        status=status,
-                        mimetype="application/json"
-                    )
-                else:
-                    respuesta = Response(status=status)
+            oferta = Oferta()
+            oferta.titulo = oferta_recibida["titulo"]
+            oferta.descripcion = oferta_recibida["descripcion"]
+            oferta.fechaCreacion = oferta_recibida["fechaCreacion"]
+            oferta.fechaFin = oferta_recibida["fechaFin"]
+            oferta.categoria = oferta_recibida["categoria"]
+            oferta.publicador = oferta_recibida["publicador"]
+            oferta.precio = oferta_recibida["precio"]
+            status = oferta.registrar_oferta()
+            if status == RECURSO_CREADO:
+                respuesta = Response(
+                    json.dumps({
+                        "idPublicacion": oferta.idPublicacion,
+                        "titulo": oferta.titulo,
+                        "descripcion": oferta.descripcion,
+                        "fechaCreacion": oferta.fechaCreacion,
+                        "fechaFin": oferta.fechaFin,
+                        "publicador": oferta.publicador
+                    }),
+                    status=status,
+                    mimetype="application/json"
+                )
             else:
-                respuesta = Response(status=NO_ENCONTRADO)
-    else:
-        respuesta = Response(status=MALA_SOLICITUD)
+                respuesta = Response(status=status)
+        else:
+            respuesta = Response(status=MALA_SOLICITUD)
 
     return respuesta
+
+
+@rutas_oferta.route("/ofertas/<idPublicacion>", methods=["PUT"])
+def actualizar_oferta(idPublicacion):
+    oferta_recibida = request.json
+    valores_requeridos = {"titulo", "descripcion", "precio", "fechaCreacion", "fechaFin", "categoria", "vinculo"}
+    respuesta = Response(status=MALA_SOLICITUD)
+    if oferta_recibida is not None:
+        if all(llave in oferta_recibida for llave in valores_requeridos):
+            oferta = Oferta()
+            oferta.titulo = oferta_recibida["titulo"]
+            oferta.descripcion = oferta_recibida["descripcion"]
+            oferta.fechaCreacion = oferta_recibida["fechaCreacion"]
+            oferta.fechaFin = oferta_recibida["fechaFin"]
+            oferta.categoria = oferta_recibida["categoria"]
+            oferta.precio = oferta_recibida["precio"]
+            oferta.vinculo = oferta_recibida["vinculo"]
+            status = oferta.actualizar_oferta(idPublicacion)
+            if status == RECURSO_CREADO:
+                respuesta = Response(
+                    json.dumps(oferta.convertir_a_json(
+                        ["idPublicacion", "titulo", "descripcion", "precio", "fechaCreacion", "fechaFin",
+                         "categoria", "vinculo"])),
+                    status=status,
+                    mimetype="application/json"
+                )
+            else:
+                respuesta = Response(status=status)
+        else:
+            respuesta = Response(status=MALA_SOLICITUD)
+
+    return respuesta
+
+
+@rutas_oferta.route("/ofertas/<idPublicacion>", methods=["DELETE"])
+def eliminar_oferta(idPublicacion):
+    status = Oferta.eliminar_oferta(idPublicacion)
+    return Response(status=status)

@@ -1,40 +1,57 @@
-from sqlalchemy import Column, String, Integer, Float, ForeignKey
-from sqlalchemy.exc import SQLAlchemyError
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import Session, relationship
-
+from src.datos.EasyConnection import EasyConnection
 from src.negocio.Publicacion import Publicacion
-
-Base = declarative_base()
 
 
 class Oferta(Publicacion):
-    __tablename__ = "Oferta"
-
-    idPublicacion: Column = Column(Integer(), ForeignKey("Publicacion.idPublicacion"), primary_key=True, nullable=False)
-    precio: Column = Column(Float(), nullable=False, unique=False)
-    vinculo: Column = Column(String(2048))
-    __mapper_args__ = {"polymorphic_identity": "Oferta"}
 
     def __init__(self):
         super().__init__()
         self.precio = None
         self.vinculo = None
         self.tipoPublicacion = "Oferta"
-        self.conexion = Oferta.abrir_conexion()
 
+    def convertir_a_json(self, atributos: list)->dict:
+        diccionario = {}
+        for key in atributos:
+            if key in self.__dict__.keys():
+                diccionario[key]=self.__getattribute__(key)
+        return diccionario
 
-    def registrar_oferta(self, id_publicacion: int) -> int:
-        registrado = 409
-        if not self.estaRegistrada():
-            try:
-                self.idPublicacion = id_publicacion
-                self.conexion.add(self)
-                self.conexion.commit()
-                registrado = 201
-            except SQLAlchemyError as sql_error:
-                registrado = 500
-                print(sql_error)
-            finally:
-                self.conexion.close()
-        return registrado
+    def registrar_oferta(self) -> int:
+        respuesta = 500
+        conexion = EasyConnection()
+        query = "CALL SPI_registrarOferta (%s, %s, %s, %s, %s, %s, %s, %s)"
+        values = [self.titulo, self.descripcion, self.precio, self.fechaCreacion, self.fechaFin, self.categoria,
+                  self.vinculo, self.publicador]
+        if conexion.send_query(query, values):
+            respuesta = 201
+        else:
+            respuesta = 400
+
+        return respuesta
+
+    @staticmethod
+    def eliminar_oferta(id_publicacion: int) -> int:
+        respuesta = 500
+        conexion = EasyConnection()
+        query = "CALL SPA_eliminarOferta(%s)"
+        values = [id_publicacion]
+        if conexion.send_query(query, values):
+            respuesta = 204
+        else:
+            respuesta = 400
+
+        return respuesta
+
+    def actualizar_oferta(self, id_publicacin: int) -> int:
+        respuesta = 500
+        conexion = EasyConnection()
+        query = "CALL SPA_actualizarOferta(%s, %s, %s, %s, %s, %s, %s, %s)"
+        values = [id_publicacin, self.titulo, self.descripcion, self.precio, self.fechaCreacion,
+                  self.fechaFin, self.categoria, self.vinculo]
+        if conexion.send_query(query, values):
+            respuesta = 200
+        else:
+            respuesta = 400
+
+        return respuesta
