@@ -221,6 +221,18 @@ paths:
         '400':
           $ref: '#/components/responses/BadRequest'
 
+  /publicaciones:
+    post:
+      summary: Publica un comentario en una publicacion
+      tags:
+        - Publicaciones
+      operationId: postComentario
+      requestBody:
+
+
+
+
+
   /codigos/{id_Codigo}:
       description: Un codigo identificado por su id
       get:
@@ -610,6 +622,16 @@ components:
           type: string
           description: Comentario explicando el porque de la denuncia
           example: La publicacion ofrece cocaina y marihuana
+
+    ComentarioSchema:
+      type: object
+      required:
+        - contenido
+      properties:
+        contenido:
+          type: string
+          description: Contenido del comentario hecho a la publicación
+          example: Excelente oderta, aprovechen!
 
 
 
