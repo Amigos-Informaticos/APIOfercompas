@@ -221,6 +221,18 @@ paths:
         '400':
           $ref: '#/components/responses/BadRequest'
 
+  /publicaciones:
+    post:
+      summary: Publica un comentario en una publicacion
+      tags:
+        - Publicaciones
+      operationId: postComentario
+      requestBody:
+
+
+
+
+
   /codigos/{id_Codigo}:
       description: Un codigo identificado por su id
       get:
@@ -311,7 +323,7 @@ paths:
     post:
       summary: Registra un miembroOfercompas en la comunidad
       tags:
-        - Miembros
+        - Ofertas
       requestBody:
         description: Un miembro Ofercompas
         required: true
@@ -328,43 +340,6 @@ paths:
                 $ref: '#/components/schemas/MiembroOfercompasSchema'
         '400':
             $ref: '#/components/responses/BadRequest'
-
-  /login:
-    description: Sección de inicio de sesión de los miembrosOfercompas
-    get:
-      summary: Inicia sesión de un miembroOfercompas en el sistema
-      tags:
-        - Login
-      parameters:
-        - in: header
-          name: email
-          schema:
-            type: string
-            format: email
-          required: true
-          example: rendon.lg@gmail.com
-        - in: header
-          name: contrasenia
-          schema:
-            type: string
-          required: true
-          example: contra12345
-
-
-      responses:
-        '200':
-          description: Se ha encontrado el miembro solicitado
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/MiembroOfercompasSchema'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '404':
-          $ref: '#/components/responses/NotFound'
-
-
-
 
   /miembros/{idMiembro}:
     description: Un miembro indentificado por su id
@@ -647,3 +622,17 @@ components:
           type: string
           description: Comentario explicando el porque de la denuncia
           example: La publicacion ofrece cocaina y marihuana
+
+    ComentarioSchema:
+      type: object
+      required:
+        - contenido
+      properties:
+        contenido:
+          type: string
+          description: Contenido del comentario hecho a la publicación
+          example: Excelente oderta, aprovechen!
+
+
+
+
