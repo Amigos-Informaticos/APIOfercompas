@@ -12,7 +12,8 @@ rutas_oferta = Blueprint("rutas_oferta", __name__)
 @rutas_oferta.route("/ofertas", methods=["POST"])
 def registrar_oferta():
     oferta_recibida = request.json
-    valores_requeridos = {"titulo", "descripcion", "precio", "fechaCreacion", "fechaFin", "publicador", "categoria"}
+    valores_requeridos = {"titulo", "descripcion", "precio", "fechaCreacion", "fechaFin", "publicador", "categoria", "vinculo"}
+    print(oferta_recibida)
     respuesta = Response(status=MALA_SOLICITUD)
     if oferta_recibida is not None:
         if all(llave in oferta_recibida for llave in valores_requeridos):
@@ -24,6 +25,7 @@ def registrar_oferta():
             oferta.categoria = oferta_recibida["categoria"]
             oferta.publicador = oferta_recibida["publicador"]
             oferta.precio = oferta_recibida["precio"]
+            oferta.vinculo = oferta_recibida["vinculo"]
             status = oferta.registrar_oferta()
             if status == RECURSO_CREADO:
                 respuesta = Response(
