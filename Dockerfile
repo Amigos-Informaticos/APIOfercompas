@@ -1,5 +1,6 @@
 FROM python:3.9.5-buster
 COPY . /app
 WORKDIR /app
-RUN pip3 install -r requirements.txt
-CMD ["python3", "app.py"]
+RUN pip install -r requirements.txt
+RUN pip install gunicorn
+CMD ["gunicorn", "-b", "0.0.0.0:42777", "app:app"]
