@@ -85,7 +85,7 @@ def getprueba():
             "contrasenia": "Arenas",
             "nickname": "Ramirez",
             "estado": "Sexto",
-            "tipoMiembro": "Semestre"
+            "tipoMiembro": "Semestre234"
         }),
         status=200,
         mimetype="application/json"
