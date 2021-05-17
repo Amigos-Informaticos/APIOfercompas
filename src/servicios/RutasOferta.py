@@ -10,7 +10,6 @@ rutas_oferta = Blueprint("rutas_oferta", __name__)
 
 
 @rutas_oferta.route("/ofertas", methods=["POST"])
-@Auth.requires_token
 def registrar_oferta():
     oferta_recibida = request.json
     valores_requeridos = {"titulo", "descripcion", "precio", "fechaCreacion", "fechaFin", "publicador", "categoria"}
