@@ -2,6 +2,7 @@ import json
 
 from flask import Blueprint, request, Response
 
+from src.negocio import CodigosRespuesta
 from src.negocio.MiembroOfercompas import MiembroOfercompas
 
 rutas_miembro = Blueprint("rutas_miembro", __name__)
@@ -11,7 +12,7 @@ rutas_miembro = Blueprint("rutas_miembro", __name__)
 def registrar_miembro():
     miembro_recibido = request.json
     valores_requeridos = {"email", "nickname", "contrasenia"}
-    respuesta = Response(status=400)
+    respuesta = Response(status=CodigosRespuesta.MALA_SOLICITUD)
     if miembro_recibido is not None:
         if all(llave in miembro_recibido for llave in valores_requeridos):
             miembro = MiembroOfercompas()
@@ -19,25 +20,20 @@ def registrar_miembro():
             miembro.contrasenia = miembro_recibido["contrasenia"]
             miembro.nickname = miembro_recibido["nickname"]
             resultado = miembro.registrar()
-            if resultado == 0:
+            if resultado == CodigosRespuesta.RECURSO_CREADO:
                 respuesta = Response(
-                    json.dumps({
-                        "idMiembro": miembro.idMiembro,
-                        "email": miembro.email,
-                        "contrasenia": miembro.contrasenia,
-                        "nickname": miembro.nickname,
-                        "estado": miembro.estado,
-                        "tipoMiembro": miembro.tipoMiembro
-                    }),
-                    status=201,
+                    json.dumps(miembro.convertir_a_json(["idMiembro", "email", "contrasenia", "nickname",
+                                                         "estado", "tipoMiembros"])),
+                    status=CodigosRespuesta.RECURSO_CREADO,
                     mimetype="application/json"
                 )
-            elif resultado == 1:
-                respuesta = Response(status=409)
-            elif resultado == 2:
-                respuesta = Response(status=500)
+            elif resultado == CodigosRespuesta.ERROR_INTERNO:
+                respuesta = Response(status=CodigosRespuesta.ERROR_INTERNO)
+            elif resultado == CodigosRespuesta.CONFLICTO:
+                respuesta = Response(status=CodigosRespuesta.CONFLICTO)
+
     else:
-        respuesta = Response(status=400)
+        respuesta = Response(status=CodigosRespuesta.MALA_SOLICITUD)
 
     return respuesta
 
@@ -46,37 +42,31 @@ def registrar_miembro():
 def actualizar_miembro(old_email):
     valores_requeridos = {"email", "nickname", "contrasenia"}
     miembro_recibido = request.json
-    respuesta = Response(200)
+    respuesta = Response(CodigosRespuesta.MALA_SOLICITUD)
     if all(llave in miembro_recibido for llave in valores_requeridos):
         miembro = MiembroOfercompas()
         miembro.email = miembro_recibido["email"]
         miembro.contrasenia = miembro_recibido["contrasenia"]
         miembro.nickname = miembro_recibido["nickname"]
-        resultado = miembro.actualizar_miembro(old_email)
-        if resultado == 0:
+        resultado = miembro.actualizar(old_email)
+        if resultado == CodigosRespuesta.OK:
             respuesta = Response(
-                json.dumps({
-                    "idMiembro": miembro.idMiembro,
-                    "email": miembro.email,
-                    "contrasenia": miembro.contrasenia,
-                    "nickname": miembro.nickname,
-                    "estado": miembro.estado,
-                    "tipoMiembro": miembro.tipoMiembro
-                }),
-                status=200,
+                json.dumps(miembro.convertir_a_json(["idMiembro", "email", "contrasenia", "nickname",
+                                                         "estado", "tipoMiembros"])),
+                status=CodigosRespuesta.OK,
                 mimetype="application/json"
             )
-        elif resultado == 1:
-            respuesta = Response(status=409)
-        elif resultado == 2:
-            respuesta = Response(status=500)
-        elif resultado == 3:
-            respuesta = Response(status=404)
+        elif resultado == CodigosRespuesta.ERROR_INTERNO:
+            respuesta = Response(status=CodigosRespuesta.ERROR_INTERNO)
+        elif resultado == CodigosRespuesta.CONFLICTO:
+            respuesta = Response(status= CodigosRespuesta.CONFLICTO)
+
     else:
         respuesta = Response(status=400)
-    return  respuesta
+    return respuesta
 
-@rutas_miembro.route("/miembros",methods=["GET"])
+
+@rutas_miembro.route("/miembros", methods=["GET"])
 def getprueba():
     respuesta = Response(
         json.dumps({
@@ -92,3 +82,36 @@ def getprueba():
     )
     return respuesta
 
+
+@rutas_miembro.route("/login", methods=["POST"])
+def iniciar_sesion():
+    valores_requeridos = {"email", "contrasenia"}
+    miembro_recibido = request.json
+    respuesta = Response(200)
+    if all(llave in miembro_recibido for llave in valores_requeridos):
+        miembro = MiembroOfercompas()
+        miembro.email = miembro_recibido["email"]
+        miembro.contrasenia = miembro_recibido["contrasenia"]
+        resultado = miembro.iniciar_sesion()
+        if resultado == 0:
+            respuesta = Response(
+                json.dumps({
+                    "idMiembro": miembro.idMiembro,
+                    "email": miembro.email,
+                    "contrasenia": miembro.contrasenia,
+                    "nickname": miembro.nickname,
+                    "estado": miembro.estado,
+                    "tipoMiembro": miembro.tipoMiembro
+                }),
+                status=200,
+                mimetype="application/json"
+            )
+        elif resultado == 1:
+            respuesta = Response(status=404)
+        elif resultado == 2:
+            respuesta = Response(status=500)
+        elif resultado == 3:
+            respuesta = Response(status=404)
+    else:
+        respuesta = Response(status=400)
+    return respuesta
