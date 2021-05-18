@@ -6,6 +6,6 @@ rutas_publicacion = Blueprint("rutas_publicacion", __name__)
 
 
 @rutas_publicacion.route("/publicaciones/<idPublicacion>", methods=["DELETE"])
-def eliminar_codigo(idPublicacion):
+def eliminar_publicacion(idPublicacion):
     status = Publicacion.eliminar_publicacion(idPublicacion)
     return Response(status=status)
