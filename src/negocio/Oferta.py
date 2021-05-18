@@ -23,6 +23,7 @@ class Oferta(Publicacion):
         query = "CALL SPI_registrarOferta (%s, %s, %s, %s, %s, %s, %s, %s)"
         values = [self.titulo, self.descripcion, self.precio, self.fechaCreacion, self.fechaFin, self.categoria,
                   self.vinculo, self.publicador]
+        print(values)
         if conexion.send_query(query, values):
             respuesta = 201
         else:
@@ -42,3 +43,4 @@ class Oferta(Publicacion):
             respuesta = 400
 
         return respuesta
+
