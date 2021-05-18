@@ -1,47 +1,42 @@
 import pytest
+
+from src.negocio import CodigosRespuesta, TipoMiembro
 from src.negocio.MiembroOfercompas import MiembroOfercompas
 
+
 miembro = MiembroOfercompas()
-miembro.email = "jorge@gmail.com"
-miembro.tipoMiembro = 1
-miembro.nickname = "jorgito"
-miembro.estado = 1
-
-
-def test_registrar_miembro_ofercompas():
-    resultado = miembro.registrar()
-    assert resultado == 0
-
-
-def test_actualizar_miembro_ofercompas():
-    miembro.nickname = "jorgitoActualizado"
-    resultado = miembro.actualizar_miembro("jorge@gmail.com")
-    assert resultado == 0
-
-
-def test_iniciar_sesion():
-    resultado = miembro.iniciar_sesion()
-    assert  resultado == 0
+miembro.email = "nuevoMiembro@gmail.com"
+miembro.tipoMiembro = TipoMiembro.COMUN
+miembro.nickname = "nuevoMiembro"
+miembro.contrasenia = "123456"
 
 
 def test_email_registrado():
+    miembro.email = "edsonsito@gmail.com"
     resultado = miembro.email_registrado()
-    assert  resultado
+    assert resultado
+
 
 def test_nickname_registrado():
+    miembro.nickname = "MtroOcharan"
     resultado = miembro.nickname_registrado()
     assert resultado
 
-def test_recuperar_miembro_ofercompas():
-    miembro_recuperar = MiembroOfercompas()
-    miembro_recuperar.email = "jorge@gmail.com"
-    miembro_recuperar.recuperar_miembro()
-    esIgual = False
-    if miembro_recuperar.email == miembro.email and miembro_recuperar.nickname == miembro.nickname:
-        esIgual = True
-    assert  esIgual
+
+def test_registrar():
+    resultado = miembro.registrar()
+    assert resultado == CodigosRespuesta.RECURSO_CREADO or resultado == CodigosRespuesta.CONFLICTO
 
 
+def test_actualizar_miembro():
+    miembro.nickname = "Jorge Manuel"
+    miembro.email = "jorgemanuel@gmail.com"
+    resultado = miembro.actualizar("holaGGG@gmail.com")
+    assert resultado == CodigosRespuesta.OK
 
-
+def test_get_id():
+    miembro.email = "jorgemanuel@gmail.com"
+    id_miembro = miembro.getId()
+    id_esperado = 11
+    assert  id_miembro == id_esperado
 
