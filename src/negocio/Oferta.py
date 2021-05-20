@@ -44,3 +44,23 @@ class Oferta(Publicacion):
 
         return respuesta
 
+
+    @staticmethod
+    def obtener_oferta(pagina: int, categoria: int):
+        conexion = EasyConnection()
+        query = "CALL SPS_obtenerOfertasGeneral(%s, %s)"
+        values = [pagina, categoria]
+        ofertas_obtenidas = conexion.select(query, values)
+        resultado = []
+        if ofertas_obtenidas:
+            for oferta_individual in ofertas_obtenidas:
+                oferta_aux = Oferta()
+                oferta_aux.idPublicacion = oferta_individual["idPublicacion"]
+                oferta_aux.titulo = oferta_individual["titulo"]
+                oferta_aux.descripcion = oferta_individual["descripcion"]
+                oferta_aux.fechaCreacion = str(oferta_individual["fechaCreacion"])
+                oferta_aux.fechaFin = str(oferta_individual["fechaFin"])
+                oferta_aux.precio = oferta_individual["precio"]
+                oferta_aux.vinculo = oferta_individual["vinculo"]
+                resultado.append(oferta_aux)
+        return resultado

@@ -2,7 +2,7 @@ import json
 
 from flask import Blueprint, request, Response
 
-from src.negocio.CodigosRespuesta import MALA_SOLICITUD, RECURSO_CREADO, OK
+from src.negocio.CodigosRespuesta import MALA_SOLICITUD, RECURSO_CREADO, OK, NO_ENCONTRADO
 from src.negocio.Oferta import Oferta
 from src.servicios.Auth import Auth
 
@@ -12,7 +12,8 @@ rutas_oferta = Blueprint("rutas_oferta", __name__)
 @rutas_oferta.route("/ofertas", methods=["POST"])
 def registrar_oferta():
     oferta_recibida = request.json
-    valores_requeridos = {"titulo", "descripcion", "precio", "fechaCreacion", "fechaFin", "publicador", "categoria", "vinculo"}
+    valores_requeridos = {"titulo", "descripcion", "precio", "fechaCreacion", "fechaFin", "publicador", "categoria",
+                          "vinculo"}
     print(oferta_recibida)
     respuesta = Response(status=MALA_SOLICITUD)
     if oferta_recibida is not None:
@@ -84,3 +85,19 @@ def actualizar_oferta(idPublicacion):
 def eliminar_oferta(idPublicacion):
     status = Oferta.eliminar_oferta(idPublicacion)
     return Response(status=status)
+
+
+@rutas_oferta.route("/ofertas", methods=["GET"])
+def obtener_oferta():
+    pagina = request.args.get("pagina", default=1, type=int)
+    categoria = request.args.get("categoria", default=-1, type=int)
+    ofertas = Oferta.obtener_oferta(pagina, categoria)
+    if ofertas:
+        ofertas_jsons = []
+        for oferta in ofertas:
+            ofertas_jsons.append(oferta.convertir_a_json(
+                ["idPublicacion", "titulo", "descripcion", "fechaCreacion", "fechaFin", "precio", "vinculo"]))
+        respuesta = Response(json.dumps(ofertas_jsons),status=OK,mimetype="application/json")
+    else:
+        respuesta = Response(status=NO_ENCONTRADO)
+    return respuesta

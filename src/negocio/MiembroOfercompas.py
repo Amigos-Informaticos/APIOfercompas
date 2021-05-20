@@ -70,7 +70,7 @@ class MiembroOfercompas():
         values = [self.email]
         conexion = EasyConnection()
         resultados = conexion.select(query, values)
-        id_recuperado = resultados[0][0]
+        id_recuperado = resultados[0]["idMiembro"]
         return id_recuperado
 
     def email_registrado_actualizar(self) -> bool:
