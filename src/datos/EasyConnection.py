@@ -10,13 +10,14 @@ class EasyConnection:
         self.host = "ofercompas.ddns.net"
         self.connection = None
 
-    def connect(self):
+    def connect(self, include_params: bool = False):
         self.connection = mysql.connector.connect(
             host=self.host,
             database=self.database,
             user=self.user,
             password=self.password
         )
+        return self.connection.cursor(prepared=include_params)
 
     def close_connection(self):
         if self.connection.is_connected():
@@ -26,14 +27,12 @@ class EasyConnection:
         executed = False
         if self.host is not None:
             parameters: tuple = ()
-            if values is not None:
-                parameters = tuple(values)
             try:
-                self.connect()
                 if values is not None:
-                    cursor = self.connection.cursor(prepared=True)
+                    cursor = self.connect(True)
+                    parameters = tuple(values)
                 else:
-                    cursor = self.connection.cursor()
+                    cursor = self.connect()
                 cursor.execute(query, parameters)
                 self.connection.commit()
                 executed = True
@@ -47,16 +46,16 @@ class EasyConnection:
         results = []
         if self.host is not None:
             parameters: tuple = ()
-            if values is not None:
-                parameters = tuple(values)
             try:
-                self.connect()
                 if values is not None:
-                    cursor = self.connection.cursor(prepared=True)
+                    cursor = self.connect(True)
+                    parameters = tuple(values)
                 else:
-                    cursor = self.connection.cursor()
+                    cursor = self.connect(False)
                 cursor.execute(query, parameters)
-                results = cursor.fetchall()
+                tmp_results = cursor.fetchall()
+                for row in tmp_results:
+                    results.append(dict(zip(cursor.column_names, row)))
             except Error as error:
                 print(f"Problem connecting to the database: {error}")
             finally:
