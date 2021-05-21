@@ -1,9 +1,10 @@
 import json
 
-from flask import Blueprint, request, Response
+from flask import Blueprint, request, Response, session
 
-from src.negocio import CodigosRespuesta
+from src.negocio import CodigosRespuesta, TipoMiembro
 from src.negocio.MiembroOfercompas import MiembroOfercompas
+from src.servicios.Auth import Auth
 
 rutas_miembro = Blueprint("rutas_miembro", __name__)
 
@@ -39,6 +40,8 @@ def registrar_miembro():
 
 
 @rutas_miembro.route("/miembros/<old_email>", methods=["PUT"])
+@Auth.requires_token
+@Auth.requires_role(TipoMiembro.COMUN)
 def actualizar_miembro(old_email):
     valores_requeridos = {"email", "nickname", "contrasenia"}
     miembro_recibido = request.json
@@ -52,14 +55,14 @@ def actualizar_miembro(old_email):
         if resultado == CodigosRespuesta.OK:
             respuesta = Response(
                 json.dumps(miembro.convertir_a_json(["idMiembro", "email", "contrasenia", "nickname",
-                                                         "estado", "tipoMiembros"])),
+                                                     "estado", "tipoMiembros"])),
                 status=CodigosRespuesta.OK,
                 mimetype="application/json"
             )
         elif resultado == CodigosRespuesta.ERROR_INTERNO:
             respuesta = Response(status=CodigosRespuesta.ERROR_INTERNO)
         elif resultado == CodigosRespuesta.CONFLICTO:
-            respuesta = Response(status= CodigosRespuesta.CONFLICTO)
+            respuesta = Response(status=CodigosRespuesta.CONFLICTO)
 
     else:
         respuesta = Response(status=400)
@@ -87,31 +90,28 @@ def getprueba():
 def iniciar_sesion():
     valores_requeridos = {"email", "contrasenia"}
     miembro_recibido = request.json
-    respuesta = Response(200)
+    respuesta = Response(CodigosRespuesta.MALA_SOLICITUD)
     if all(llave in miembro_recibido for llave in valores_requeridos):
         miembro = MiembroOfercompas()
         miembro.email = miembro_recibido["email"]
         miembro.contrasenia = miembro_recibido["contrasenia"]
+
         resultado = miembro.iniciar_sesion()
-        if resultado == 0:
+        if resultado == CodigosRespuesta.OK:
+            token = Auth.generate_token(miembro)
+            session.permanent = True
+            session["token"] = token
+            miembro_json = miembro.convertir_a_json(["idMiembro", "email", "contrasenia", "nickname",
+                                                     "estado", "tipoMiembros"])
+            miembro_json["token"] = token
             respuesta = Response(
-                json.dumps({
-                    "idMiembro": miembro.idMiembro,
-                    "email": miembro.email,
-                    "contrasenia": miembro.contrasenia,
-                    "nickname": miembro.nickname,
-                    "estado": miembro.estado,
-                    "tipoMiembro": miembro.tipoMiembro
-                }),
-                status=200,
+                json.dumps(miembro_json),
+                status=CodigosRespuesta.OK,
                 mimetype="application/json"
+
             )
-        elif resultado == 1:
-            respuesta = Response(status=404)
-        elif resultado == 2:
-            respuesta = Response(status=500)
-        elif resultado == 3:
-            respuesta = Response(status=404)
+        else:
+            respuesta = Response(status=resultado)
     else:
-        respuesta = Response(status=400)
+        respuesta = Response(status=CodigosRespuesta.MALA_SOLICITUD)
     return respuesta

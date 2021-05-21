@@ -5,7 +5,7 @@ from typing import Any
 from cryptography.fernet import Fernet
 from flask import session, Response, request
 
-from src.negocio.CodigosRespuesta import NO_AUTORIZADO, PROHIBIDO
+from src.negocio.CodigosRespuesta import NO_AUTORIZADO, PROHIBIDO, SESION_EXPIRADA
 from src.negocio.MiembroOfercompas import MiembroOfercompas
 
 
@@ -19,17 +19,20 @@ class Auth:
     @staticmethod
     def requires_token(operation):
         def verify_auth(*args, **kwargs):
-            token = request.headers.get("Token")
+            token = request.headers.get("token")
+            saved_token = None
             try:
                 saved_token = session["token"]
+                if token is not None and saved_token is not None and token == saved_token:
+                    session.modified = True
+                    response = operation(*args, **kwargs)
+                else:
+                    response = Response(status=NO_AUTORIZADO)
             except KeyError:
-                saved_token = None
-            print(token)
-            print(saved_token)
-            if token is not None and saved_token is not None and token == saved_token:
-                response = operation(*args, **kwargs)
-            else:
-                response = Response(status=NO_AUTORIZADO)
+                if token is not None and saved_token is None:
+                    response = Response(status=SESION_EXPIRADA)
+                else:
+                    response = Response(status=NO_AUTORIZADO)
             return response
 
         return update_wrapper(verify_auth, operation)
@@ -38,10 +41,10 @@ class Auth:
     def requires_role(role: Any):
         def decorator(operation):
             def verify_role(*args, **kwargs):
-                token = request.headers.get("Token")
+                token = request.headers.get("token")
                 if token is not None:
                     values = Auth.decode_token(token)
-                    if str(values["is_owner"]) == str(role):
+                    if str(values["tipo_miembro"]) == str(role):
                         response = operation(*args, **kwargs)
                     else:
                         response = Response(status=PROHIBIDO)
@@ -58,7 +61,10 @@ class Auth:
         if Auth.secret_password is None:
             Auth.set_password()
         timestamp = datetime.now().strftime("%H:%M:%S")
-        value: str = miembro_ofercompas.email + "/" + str(int(miembro_ofercompas.is_owner)) + "/" + timestamp
+        value: str = miembro_ofercompas.email + "/"
+        value += miembro_ofercompas.contrasenia + "/"
+        value += str(int(miembro_ofercompas.tipoMiembro)) + "/"
+        value += timestamp
         return Auth.encode(value, Auth.secret_password)
 
     @staticmethod
@@ -67,7 +73,8 @@ class Auth:
         decoded_token = decoded_token.split("/")
         return {
             "email": decoded_token[0],
-            "is_owner": decoded_token[1]
+            "contrasenia": decoded_token[1],
+            "tipo_miembro": decoded_token[2]
         }
 
     @staticmethod

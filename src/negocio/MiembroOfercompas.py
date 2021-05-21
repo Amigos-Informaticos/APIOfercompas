@@ -83,3 +83,28 @@ class MiembroOfercompas():
         if len(resultado) > 0:
             status = True
         return status
+
+    def expulsar(self) -> int:
+        status = CodigosRespuesta.ERROR_INTERNO
+        conexion = EasyConnection()
+        query = "UPDATE MiembroOfercompas SET estado = 2 WHERE email = %s;"
+        values = [self.email]
+        resultado = conexion.send_query(query, values)
+        status = CodigosRespuesta.OK
+        return status
+
+    def iniciar_sesion(self) -> int:
+        status = CodigosRespuesta.ERROR_INTERNO
+        conexion = EasyConnection()
+        query = "SELECT * FROM MiembroOfercompas WHERE email = %s and contrasenia = %s and estado = 1;"
+        values = [self.email, self.contrasenia]
+        resultado = conexion.select(query, values)
+
+        if len(resultado) > 0:
+            self.idMiembro = resultado[0]["idMiembro"]
+            self.tipoMiembro = resultado[0]["tipoMiembro"]
+            self.nickname = resultado[0]["nickname"]
+            status = CodigosRespuesta.OK
+        else:
+            status = CodigosRespuesta.NO_ENCONTRADO
+        return status
