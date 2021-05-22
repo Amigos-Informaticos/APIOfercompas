@@ -1,3 +1,7 @@
+from http import HTTPStatus
+
+from flask import json
+
 from src.datos.EasyConnection import EasyConnection
 from src.negocio.Publicacion import Publicacion
 
@@ -10,6 +14,12 @@ class Oferta(Publicacion):
         self.vinculo = None
         self.tipoPublicacion = "Oferta"
 
+    def hacer_json(self):
+        return json.dumps({"titulo": self.titulo,
+                           "descripcion": self.descripcion,
+                           "precio": self.precio,
+                           "fechaCreacion": self.fechaCreacion})
+
     def convertir_a_json(self, atributos: list) -> dict:
         diccionario = {}
         for key in atributos:
@@ -18,16 +28,16 @@ class Oferta(Publicacion):
         return diccionario
 
     def registrar_oferta(self) -> int:
-        respuesta = 500
+        respuesta = HTTPStatus.INTERNAL_SERVER_ERROR
         conexion = EasyConnection()
         query = "CALL SPI_registrarOferta (%s, %s, %s, %s, %s, %s, %s, %s)"
         values = [self.titulo, self.descripcion, self.precio, self.fechaCreacion, self.fechaFin, self.categoria,
                   self.vinculo, self.publicador]
         print(values)
         if conexion.send_query(query, values):
-            respuesta = 201
+            respuesta = HTTPStatus.CREATED
         else:
-            respuesta = 400
+            respuesta = HTTPStatus.BAD_REQUEST
 
         return respuesta
 
@@ -43,7 +53,6 @@ class Oferta(Publicacion):
             respuesta = 400
 
         return respuesta
-
 
     @staticmethod
     def obtener_oferta(pagina: int, categoria: int):
