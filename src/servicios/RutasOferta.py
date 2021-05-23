@@ -1,6 +1,7 @@
 import json
+from http import HTTPStatus
 
-from flask import Blueprint, request, Response
+from flask import Blueprint, request, Response, jsonify
 
 from src.negocio.CodigosRespuesta import MALA_SOLICITUD, RECURSO_CREADO, OK, NO_ENCONTRADO
 from src.negocio.Oferta import Oferta
@@ -15,7 +16,7 @@ def registrar_oferta():
     valores_requeridos = {"titulo", "descripcion", "precio", "fechaCreacion", "fechaFin", "publicador", "categoria",
                           "vinculo"}
     print(oferta_recibida)
-    respuesta = Response(status=MALA_SOLICITUD)
+    respuesta = Response(status=HTTPStatus.BAD_REQUEST)
     if oferta_recibida is not None:
         if all(llave in oferta_recibida for llave in valores_requeridos):
             oferta = Oferta()
@@ -28,23 +29,16 @@ def registrar_oferta():
             oferta.precio = oferta_recibida["precio"]
             oferta.vinculo = oferta_recibida["vinculo"]
             status = oferta.registrar_oferta()
-            if status == RECURSO_CREADO:
+            if status == HTTPStatus.OK:
                 respuesta = Response(
-                    json.dumps({
-                        "idPublicacion": oferta.idPublicacion,
-                        "titulo": oferta.titulo,
-                        "descripcion": oferta.descripcion,
-                        "fechaCreacion": oferta.fechaCreacion,
-                        "fechaFin": oferta.fechaFin,
-                        "publicador": oferta.publicador
-                    }),
+                    oferta.hacer_json(),
                     status=status,
                     mimetype="application/json"
                 )
             else:
                 respuesta = Response(status=status)
         else:
-            respuesta = Response(status=MALA_SOLICITUD)
+            respuesta = Response(status=HTTPStatus.BAD_REQUEST)
 
     return respuesta
 
@@ -97,6 +91,8 @@ def obtener_oferta():
         for oferta in ofertas:
             ofertas_jsons.append(oferta.convertir_a_json(
                 ["idPublicacion", "titulo", "descripcion", "fechaCreacion", "fechaFin", "precio", "vinculo"]))
+        prueba = json.dumps(ofertas_jsons)
+        print(prueba)
         respuesta = Response(json.dumps(ofertas_jsons),status=OK,mimetype="application/json")
     else:
         respuesta = Response(status=NO_ENCONTRADO)
