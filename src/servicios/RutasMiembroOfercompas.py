@@ -17,14 +17,11 @@ def registrar_miembro():
     if miembro_recibido is not None:
         if all(llave in miembro_recibido for llave in valores_requeridos):
             miembro = MiembroOfercompas()
-            miembro.email = miembro_recibido["email"]
-            miembro.contrasenia = miembro_recibido["contrasenia"]
-            miembro.nickname = miembro_recibido["nickname"]
+            miembro.instanciar_con_hashmap(miembro_recibido)
             resultado = miembro.registrar()
             if resultado == CodigosRespuesta.RECURSO_CREADO:
                 respuesta = Response(
-                    json.dumps(miembro.convertir_a_json(["idMiembro", "email", "contrasenia", "nickname",
-                                                         "estado", "tipoMiembros"])),
+                    miembro.hacer_json(),
                     status=CodigosRespuesta.RECURSO_CREADO,
                     mimetype="application/json"
                 )
@@ -48,14 +45,11 @@ def actualizar_miembro(old_email):
     respuesta = Response(CodigosRespuesta.MALA_SOLICITUD)
     if all(llave in miembro_recibido for llave in valores_requeridos):
         miembro = MiembroOfercompas()
-        miembro.email = miembro_recibido["email"]
-        miembro.contrasenia = miembro_recibido["contrasenia"]
-        miembro.nickname = miembro_recibido["nickname"]
+        miembro.instanciar_con_hashmap(miembro_recibido)
         resultado = miembro.actualizar(old_email)
         if resultado == CodigosRespuesta.OK:
             respuesta = Response(
-                json.dumps(miembro.convertir_a_json(["idMiembro", "email", "contrasenia", "nickname",
-                                                     "estado", "tipoMiembros"])),
+                miembro.hacer_json(),
                 status=CodigosRespuesta.OK,
                 mimetype="application/json"
             )
@@ -101,11 +95,10 @@ def iniciar_sesion():
             token = Auth.generate_token(miembro)
             session.permanent = True
             session["token"] = token
-            miembro_json = miembro.convertir_a_json(["idMiembro", "email", "contrasenia", "nickname",
-                                                     "estado", "tipoMiembros"])
-            miembro_json["token"] = token
+            miembro_json = miembro.hacer_json_token(token)
+
             respuesta = Response(
-                json.dumps(miembro_json),
+                miembro_json,
                 status=CodigosRespuesta.OK,
                 mimetype="application/json"
 
