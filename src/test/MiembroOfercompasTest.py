@@ -3,7 +3,6 @@ import pytest
 from src.negocio import CodigosRespuesta, TipoMiembro
 from src.negocio.MiembroOfercompas import MiembroOfercompas
 
-
 miembro = MiembroOfercompas()
 miembro.email = "nuevoMiembro@gmail.com"
 miembro.tipoMiembro = TipoMiembro.COMUN
@@ -34,9 +33,20 @@ def test_actualizar_miembro():
     resultado = miembro.actualizar("holaGGG@gmail.com")
     assert resultado == CodigosRespuesta.OK
 
+
 def test_get_id():
     miembro.email = "jorgemanuel@gmail.com"
     id_miembro = miembro.getId()
     id_esperado = 11
-    assert  id_miembro == id_esperado
+    assert id_miembro == id_esperado
 
+
+def test_iniciar_sesion():
+    miembroConSesion = MiembroOfercompas()
+    miembroConSesion.email = "efrainrazziel@gmail.com"
+    miembroConSesion.contrasenia = "beethoven"
+    respuesta = miembroConSesion.iniciar_sesion()
+    valores_llenados = False
+    if miembroConSesion.idMiembro is not None and miembroConSesion.nickname is not None and miembroConSesion.tipoMiembro is not None:
+        valores_llenados = True
+    assert valores_llenados and respuesta == CodigosRespuesta.OK

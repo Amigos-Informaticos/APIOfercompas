@@ -1,3 +1,5 @@
+from datetime import timedelta
+
 from flask import Flask
 
 from src.servicios.RutasCodigoDescuento import rutas_codigo
@@ -11,6 +13,8 @@ app.register_blueprint(rutas_miembro)
 app.register_blueprint(rutas_oferta)
 app.register_blueprint(rutas_publicacion)
 app.register_blueprint(rutas_codigo)
+app.config["SECRET_KEY"] = "beethoven"
+app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(minutes=120)
 
 
 @app.route('/')
