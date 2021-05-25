@@ -31,7 +31,7 @@ def registrar_oferta():
             status = oferta.registrar_oferta()
             if status == HTTPStatus.OK:
                 respuesta = Response(
-                    oferta.hacer_json(),
+                    oferta.convertir_a_json(),
                     status=status,
                     mimetype="application/json"
                 )
@@ -89,8 +89,7 @@ def obtener_oferta():
     if ofertas:
         ofertas_jsons = []
         for oferta in ofertas:
-            ofertas_jsons.append(oferta.convertir_a_json(
-                ["idPublicacion", "titulo", "descripcion", "fechaCreacion", "fechaFin", "precio", "vinculo"]))
+            ofertas_jsons.append(oferta.convertir_a_json())
         prueba = json.dumps(ofertas_jsons)
         print(prueba)
         respuesta = Response(json.dumps(ofertas_jsons),status=OK,mimetype="application/json")
