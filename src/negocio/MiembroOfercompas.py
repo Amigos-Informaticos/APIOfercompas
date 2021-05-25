@@ -1,3 +1,5 @@
+import json
+
 from src.datos.EasyConnection import EasyConnection
 from src.negocio import CodigosRespuesta, EstadoMiembro, TipoMiembro
 
@@ -11,11 +13,40 @@ class MiembroOfercompas():
         self.estado = EstadoMiembro.ACTIVO
         self.tipoMiembro = TipoMiembro.COMUN
 
+    def hacer_json(self):
+        return json.dumps({"idMiembro": self.idMiembro,
+                           "nickname": self.nickname,
+                           "email": self.email,
+                           "contrasenia": self.contrasenia,
+                           "estado" : self.estado,
+                           "tipoMiembro" : self.tipoMiembro
+                           })
+
+    def instanciar_con_hashmap(self, hash_miembro: dict):
+        self.nickname = hash_miembro["nickname"]
+        self.email = hash_miembro["email"]
+        self.contrasenia = hash_miembro["contrasenia"]
+
+    def hacer_json_token(self, token:str):
+        return json.dumps({"idMiembro": self.idMiembro,
+                           "nickname": self.nickname,
+                           "email": self.email,
+                           "contrasenia": self.contrasenia,
+                           "estado" : self.estado,
+                           "tipoMiembro" : self.tipoMiembro,
+                           "token": token
+                           })
+
+
     def convertir_a_json(self, atributos: list) -> dict:
         diccionario = {}
-        for key in atributos:
-            if key in self.__dict__.keys():
-                diccionario[key] = self.__getattribute__(key)
+        diccionario["idMiembro"] = int(self.idMiembro)
+        diccionario["tipoMiembro"] = int(self.tipoMiembro)
+        diccionario["nickname"] = self.nickname
+        diccionario["email"] = self.email
+        diccionario["contrasenia"] = self.contrasenia
+        diccionario["estado"] = int(self.estado)
+
         return diccionario
 
     def email_registrado(self) -> bool:
