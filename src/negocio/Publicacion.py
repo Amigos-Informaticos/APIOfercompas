@@ -1,7 +1,10 @@
+from http import HTTPStatus
+
 from sqlalchemy.exc import SQLAlchemyError
 
 from src.datos.EasyConnection import EasyConnection
 from src.negocio.EstadoPublicacion import EstadoPublicacion
+from src.negocio.Puntuacion import Puntuacion
 
 
 class Publicacion:
@@ -15,6 +18,7 @@ class Publicacion:
         self.fechaFin = None
         self.publicador = None
         self.categoria = 1
+        self.conexion = EasyConnection()
 
     def obtener_id(self) -> int:
         id = None
@@ -38,3 +42,20 @@ class Publicacion:
             respuesta = 400
 
         return respuesta
+
+    @staticmethod
+    def obtener_interaccion(id_miembro: int, id_publicacion: int) -> dict:
+        interacciones = {}
+        interacciones["puntuada"] = Puntuacion.ha_puntuado(id_miembro, id_publicacion)
+        interacciones["denunciada"] = Publicacion.ha_denunciado(id_miembro, id_publicacion)
+        return interacciones
+
+    @staticmethod
+    def ha_denunciado(id_miembro: int, id_publicacion: int) -> bool:
+        conexion = EasyConnection()
+        query = "SELECT idMiembro FROM Denuncia WHERE idMiembro = %s AND idPublicacion = %s"
+        values = [id_miembro, id_publicacion]
+        resultado = conexion.select(query, values)
+        return len(resultado) > 0
+
+
