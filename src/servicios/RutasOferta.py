@@ -1,11 +1,9 @@
 import json
 from http import HTTPStatus
 
-from flask import Blueprint, request, Response, jsonify
+from flask import Blueprint, request, Response
 
-from src.negocio.CodigosRespuesta import MALA_SOLICITUD, RECURSO_CREADO, OK, NO_ENCONTRADO
 from src.negocio.Oferta import Oferta
-from src.servicios.Auth import Auth
 
 rutas_oferta = Blueprint("rutas_oferta", __name__)
 
@@ -47,7 +45,7 @@ def registrar_oferta():
 def actualizar_oferta(idPublicacion):
     oferta_recibida = request.json
     valores_requeridos = {"titulo", "descripcion", "precio", "fechaCreacion", "fechaFin", "categoria", "vinculo"}
-    respuesta = Response(status=MALA_SOLICITUD)
+    respuesta = Response(status=HTTPStatus.BAD_REQUEST)
     if oferta_recibida is not None:
         if all(llave in oferta_recibida for llave in valores_requeridos):
             oferta = Oferta()
@@ -59,18 +57,16 @@ def actualizar_oferta(idPublicacion):
             oferta.precio = oferta_recibida["precio"]
             oferta.vinculo = oferta_recibida["vinculo"]
             status = oferta.actualizar_oferta(idPublicacion)
-            if status == RECURSO_CREADO:
+            if status == HTTPStatus.OK:
                 respuesta = Response(
-                    json.dumps(oferta.convertir_a_json(
-                        ["idPublicacion", "titulo", "descripcion", "precio", "fechaCreacion", "fechaFin",
-                         "categoria", "vinculo"])),
+                    json.dumps(oferta.convertir_a_json()),
                     status=status,
                     mimetype="application/json"
                 )
             else:
                 respuesta = Response(status=status)
         else:
-            respuesta = Response(status=MALA_SOLICITUD)
+            respuesta = Response(status=HTTPStatus.BAD_REQUEST)
 
     return respuesta
 
@@ -85,14 +81,18 @@ def eliminar_oferta(idPublicacion):
 def obtener_oferta():
     pagina = request.args.get("pagina", default=1, type=int)
     categoria = request.args.get("categoria", default=-1, type=int)
-    ofertas = Oferta.obtener_oferta(pagina, categoria)
+    id_publicador = request.args.get("idPublicador", default=0, type=int)
+    if id_publicador != 0:
+        ofertas = Oferta.obtener_por_id_publicador(pagina, id_publicador)
+    else:
+        ofertas = Oferta.obtener_oferta(pagina, categoria)
     if ofertas:
         ofertas_jsons = []
         for oferta in ofertas:
             ofertas_jsons.append(oferta.convertir_a_json())
         prueba = json.dumps(ofertas_jsons)
         print(prueba)
-        respuesta = Response(json.dumps(ofertas_jsons),status=OK,mimetype="application/json")
+        respuesta = Response(json.dumps(ofertas_jsons), status=HTTPStatus.OK, mimetype="application/json")
     else:
-        respuesta = Response(status=NO_ENCONTRADO)
+        respuesta = Response(status=HTTPStatus.NOT_FOUND)
     return respuesta

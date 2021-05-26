@@ -38,3 +38,26 @@ class Publicacion:
             respuesta = 400
 
         return respuesta
+
+    @staticmethod
+    def obtener_interaccion(id_miembro: int, id_publicacion: int) -> dict:
+        interacciones = {}
+        interacciones["puntuada"] = Publicacion.ha_puntuado(id_miembro, id_publicacion)
+        interacciones["denunciada"] = Publicacion.ha_denunciado(id_miembro, id_publicacion)
+        return interacciones
+
+    @staticmethod
+    def ha_puntuado(id_miembro: int, id_publicacion: int) -> bool:
+        conexion = EasyConnection()
+        query = "SELECT idPuntuador FROM Puntuacion WHERE idPuntuador = %S AND idPublicacion = %s"
+        values = [id_miembro, id_publicacion]
+        resultado = conexion.select(query, values)
+        return len(resultado) > 0
+
+    @staticmethod
+    def ha_denunciado(id_miembro: int, id_publicacion: int) -> bool:
+        conexion = EasyConnection()
+        query = "SELECT idMiembro FROM Denuncia WHERE idMiembro = %S AND idPublicacion = %s"
+        values = [id_miembro, id_publicacion]
+        resultado = conexion.select(query, values)
+        return len(resultado) > 0

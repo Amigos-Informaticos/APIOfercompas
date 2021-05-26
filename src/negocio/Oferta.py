@@ -37,15 +37,15 @@ class Oferta(Publicacion):
         return respuesta
 
     def actualizar_oferta(self, id_publicacin: int) -> int:
-        respuesta = 500
+        respuesta = HTTPStatus.INTERNAL_SERVER_ERROR
         conexion = EasyConnection()
         query = "CALL SPA_actualizarOferta(%s, %s, %s, %s, %s, %s, %s, %s)"
         values = [id_publicacin, self.titulo, self.descripcion, self.precio, self.fechaCreacion,
                   self.fechaFin, self.categoria, self.vinculo]
         if conexion.send_query(query, values):
-            respuesta = 200
+            respuesta = HTTPStatus.OK
         else:
-            respuesta = 400
+            respuesta = HTTPStatus.BAD_REQUEST
 
         return respuesta
 
@@ -68,3 +68,24 @@ class Oferta(Publicacion):
                 oferta_aux.vinculo = oferta_individual["vinculo"]
                 resultado.append(oferta_aux)
         return resultado
+
+    @staticmethod
+    def obtener_por_id_publicador(pagina: int, id_publicador: int):
+        conexion = EasyConnection()
+        query = "CALL SPS_obtenerOfertasPorPublicador(%s, %s)"
+        values = [pagina, id_publicador]
+        ofertas_obtenidas = conexion.select(query, values)
+        resultado = []
+        if ofertas_obtenidas:
+            for oferta_individual in ofertas_obtenidas:
+                oferta_aux = Oferta()
+                oferta_aux.idPublicacion = oferta_individual["idPublicacion"]
+                oferta_aux.titulo = oferta_individual["titulo"]
+                oferta_aux.descripcion = oferta_individual["descripcion"]
+                oferta_aux.fechaCreacion = str(oferta_individual["fechaCreacion"])
+                oferta_aux.fechaFin = str(oferta_individual["fechaFin"])
+                oferta_aux.precio = oferta_individual["precio"]
+                oferta_aux.vinculo = oferta_individual["vinculo"]
+                resultado.append(oferta_aux)
+        return resultado
+
