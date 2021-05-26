@@ -14,14 +14,9 @@ class Oferta(Publicacion):
         self.vinculo = None
         self.tipoPublicacion = "Oferta"
 
-    def hacer_json(self):
-        return json.dumps({"titulo": self.titulo,
-                           "descripcion": self.descripcion,
-                           "precio": self.precio,
-                           "fechaCreacion": self.fechaCreacion})
-
-    def convertir_a_json(self, atributos: list) -> dict:
+    def convertir_a_json(self) -> dict:
         diccionario = {}
+        atributos = ["idPublicacion", "titulo", "descripcion", "fechaCreacion", "fechaFin", "precio", "vinculo"]
         for key in atributos:
             if key in self.__dict__.keys():
                 diccionario[key] = self.__getattribute__(key)
