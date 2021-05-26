@@ -1,0 +1,56 @@
+from http import HTTPStatus
+
+from src.datos.EasyConnection import EasyConnection
+
+
+class Puntuacion():
+    def __init__(self):
+        self.id_publicacion = None
+        self.id_puntuador = None
+        self.es_positiva = False
+
+    def instanciar_con_hashmap(self, hash_puntuacion: dict, id_publicacion: int):
+        self.id_publicacion = id_publicacion
+        self.id_puntuador = hash_puntuacion["idMiembro"]
+        self.es_positiva = hash_puntuacion["esPositiva"]
+
+    def convertir_a_json(self) -> dict:
+        diccionario = {}
+        atributos = ["idPublicacion", "idPuntuador", "esPositiva"]
+        for key in atributos:
+            if key in self.__dict__.keys():
+                diccionario[key] = self.__getattribute__(key)
+        return diccionario
+
+    def puntuar_publicacion(self) -> int:
+        respuesta = HTTPStatus.CONFLICT
+        if not Puntuacion.ha_puntuado(self.id_puntuador, self.id_publicacion):
+            conexion = EasyConnection()
+            query = "INSERT INTO Puntuacion (idPuntuador, idPublicacion, esPositiva) VALUES (%s, %s, %s)"
+            values = [self.id_puntuador, self.id_publicacion, self.es_positiva]
+            print(values)
+            if conexion.send_query(query, values):
+                respuesta = HTTPStatus.CREATED
+            else:
+                respuesta = HTTPStatus.INTERNAL_SERVER_ERROR
+        return respuesta
+
+    @staticmethod
+    def ha_puntuado(id_miembro: int, id_publicacion: int) -> bool:
+        conexion = EasyConnection()
+        query = "SELECT idPuntuador FROM Puntuacion WHERE idPuntuador = %s AND idPublicacion = %s"
+        values = [id_miembro, id_publicacion]
+        resultado = conexion.select(query, values)
+        return len(resultado) > 0
+
+    @staticmethod
+    def calcular_puntuacion(id_publicacion: int) -> int:
+        conexion = EasyConnection()
+        query = "SELECT COUNT(*) FROM Puntuacion WHERE idPublicacion = %s AND esPositiva = 1"
+        values = [id_publicacion]
+        positivas = conexion.select(query, values)
+        query = "SELECT COUNT(*) FROM Puntuacion WHERE idPublicacion = %s AND esPositiva = 0"
+        negativas = conexion.select(query, values)
+        total = positivas.__getitem__(0)["COUNT(*)"] - negativas.__getitem__(0)["COUNT(*)"]
+        print("total = " + str(total))
+        return total
