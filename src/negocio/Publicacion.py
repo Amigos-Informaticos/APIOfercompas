@@ -19,6 +19,7 @@ class Publicacion:
         self.publicador = None
         self.categoria = 1
         self.conexion = EasyConnection()
+        self.puntuacion = 0
 
     def obtener_id(self) -> int:
         id = None
@@ -57,5 +58,7 @@ class Publicacion:
         values = [id_miembro, id_publicacion]
         resultado = conexion.select(query, values)
         return len(resultado) > 0
+
+
 
 

@@ -4,6 +4,7 @@ from flask import json
 
 from src.datos.EasyConnection import EasyConnection
 from src.negocio.Publicacion import Publicacion
+from src.negocio.Puntuacion import Puntuacion
 
 
 class Oferta(Publicacion):
@@ -16,7 +17,7 @@ class Oferta(Publicacion):
 
     def convertir_a_json(self) -> dict:
         diccionario = {}
-        atributos = ["idPublicacion", "titulo", "descripcion", "fechaCreacion", "fechaFin", "precio", "vinculo"]
+        atributos = ["idPublicacion", "titulo", "descripcion", "fechaCreacion", "fechaFin", "precio", "vinculo", "puntuacion"]
         for key in atributos:
             if key in self.__dict__.keys():
                 diccionario[key] = self.__getattribute__(key)
@@ -66,6 +67,7 @@ class Oferta(Publicacion):
                 oferta_aux.fechaFin = str(oferta_individual["fechaFin"])
                 oferta_aux.precio = oferta_individual["precio"]
                 oferta_aux.vinculo = oferta_individual["vinculo"]
+                oferta_aux.obtener_puntuacion()
                 resultado.append(oferta_aux)
         return resultado
 
@@ -86,6 +88,14 @@ class Oferta(Publicacion):
                 oferta_aux.fechaFin = str(oferta_individual["fechaFin"])
                 oferta_aux.precio = oferta_individual["precio"]
                 oferta_aux.vinculo = oferta_individual["vinculo"]
+                oferta_aux.obtener_puntuacion()
                 resultado.append(oferta_aux)
         return resultado
+
+    def obtener_puntuacion(self):
+        self.puntuacion = Puntuacion.calcular_puntuacion(self.idPublicacion)
+
+
+
+
 
