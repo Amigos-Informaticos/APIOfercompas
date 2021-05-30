@@ -95,11 +95,10 @@ def iniciar_sesion():
             token = Auth.generate_token(miembro)
             session.permanent = True
             session["token"] = token
-            miembro_json = miembro.convertir_a_json_efra()
-            print(miembro_json)
+            miembro_json = miembro.hacer_json_token(token)
 
             respuesta = Response(
-                json.dumps(miembro_json),
+                miembro_json,
                 status=CodigosRespuesta.OK,
                 mimetype="application/json"
 
