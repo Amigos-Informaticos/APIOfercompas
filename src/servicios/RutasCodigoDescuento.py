@@ -1,4 +1,5 @@
 import json
+from http import HTTPStatus
 
 from flask import Blueprint, request, Response
 
@@ -82,3 +83,23 @@ def actualizar_codigo(idPublicacion):
 def eliminar_codigo(idPublicacion):
     status = CodigoDescuento.eliminar_codigo(idPublicacion)
     return Response(status=status)
+
+@rutas_codigo.route("/codigos", methods=["GET"])
+def obtener_codigo():
+    pagina = request.args.get("pagina", default=1, type=int)
+    categoria = request.args.get("categoria", default=-1, type=int)
+    id_publicador = request.args.get("idPublicador", default=0, type=int)
+    if id_publicador != 0:
+        codigos = CodigoDescuento.obtener_por_id_publicador(pagina, id_publicador)
+    else:
+        codigos = CodigoDescuento.obtener_codigo(pagina, categoria)
+    if codigos:
+        codigos_jsons = []
+        for codigo in codigos:
+            codigos_jsons.append(codigo.convertir_a_json())
+        prueba = json.dumps(codigos_jsons)
+        print(prueba)
+        respuesta = Response(json.dumps(codigos_jsons), status=HTTPStatus.OK, mimetype="application/json")
+    else:
+        respuesta = Response(status=HTTPStatus.NOT_FOUND)
+    return respuesta

@@ -9,11 +9,13 @@ class CodigoDescuento(Publicacion):
         self.codigo = None
         self.tipoPublicacion = "CodigoDescuento"
 
-    def convertir_a_json(self, atributos: list)->dict:
+    def convertir_a_json(self) -> dict:
         diccionario = {}
+        atributos = ["idPublicacion", "titulo", "descripcion", "codigo", "fechaCreacion", "fechaFin", "publicador",
+                     "categoria"]
         for key in atributos:
             if key in self.__dict__.keys():
-                diccionario[key]=self.__getattribute__(key)
+                diccionario[key] = self.__getattribute__(key)
         return diccionario
 
     def registrar_codigo(self) -> int:
@@ -29,8 +31,6 @@ class CodigoDescuento(Publicacion):
 
         return respuesta
 
-
-
     def actualizar_codigo(self, id_publicacin: int) -> int:
         respuesta = 500
         conexion = EasyConnection()
@@ -43,3 +43,23 @@ class CodigoDescuento(Publicacion):
             respuesta = 400
 
         return respuesta
+
+    @staticmethod
+    def obtener_codigo(pagina: int, categoria: int):
+        conexion = EasyConnection()
+        query = "CALL SPS_obtenerCodigosDescuento(%s, %s)"
+        values = [pagina, categoria]
+        codigos_obtenidos = conexion.select(query, values)
+        resultado = []
+        if codigos_obtenidos:
+            for codigo_individual in codigos_obtenidos:
+                codigo_aux = CodigoDescuento()
+                codigo_aux.idPublicacion = codigo_individual["idPublicacion"]
+                codigo_aux.titulo = codigo_individual["titulo"]
+                codigo_aux.descripcion = codigo_individual["descripcion"]
+                codigo_aux.fechaCreacion = str(codigo_individual["fechaCreacion"])
+                codigo_aux.fechaFin = str(codigo_individual["fechaFin"])
+                codigo_aux.codigo = codigo_individual["codigo"]
+                codigo_aux.obtener_puntuacion()
+                resultado.append(codigo_aux)
+        return resultado
