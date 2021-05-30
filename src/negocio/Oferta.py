@@ -93,8 +93,7 @@ class Oferta(Publicacion):
                 resultado.append(oferta_aux)
         return resultado
 
-    def obtener_puntuacion(self):
-        self.puntuacion = Puntuacion.calcular_puntuacion(self.idPublicacion)
+
 
     def construir_rutas(self, cantidad_imagenes: int) -> list:
         total_imagenes = self.contar_imagenes()

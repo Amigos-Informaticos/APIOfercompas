@@ -46,11 +46,11 @@ class Puntuacion():
     @staticmethod
     def calcular_puntuacion(id_publicacion: int) -> int:
         conexion = EasyConnection()
-        query = "SELECT COUNT(*) FROM Puntuacion WHERE idPublicacion = %s AND esPositiva = 1"
+        query = "SELECT COUNT(*) AS conteo FROM Puntuacion WHERE idPublicacion = %s AND esPositiva = 1"
         values = [id_publicacion]
         positivas = conexion.select(query, values)
-        query = "SELECT COUNT(*) FROM Puntuacion WHERE idPublicacion = %s AND esPositiva = 0"
+        print(positivas[0]["conteo"])
+        query = "SELECT COUNT(*) AS conteo FROM Puntuacion WHERE idPublicacion = %s AND esPositiva = 0"
         negativas = conexion.select(query, values)
-        total = positivas.__getitem__(0)["COUNT(*)"] - negativas.__getitem__(0)["COUNT(*)"]
-        print("total = " + str(total))
+        total = positivas[0]["conteo"] - negativas[0]["conteo"]
         return total
