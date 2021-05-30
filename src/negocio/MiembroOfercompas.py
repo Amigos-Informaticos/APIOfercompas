@@ -18,8 +18,8 @@ class MiembroOfercompas():
                            "nickname": self.nickname,
                            "email": self.email,
                            "contrasenia": self.contrasenia,
-                           "estado" : self.estado,
-                           "tipoMiembro" : self.tipoMiembro
+                           "estado": self.estado,
+                           "tipoMiembro": self.tipoMiembro
                            })
 
     def instanciar_con_hashmap(self, hash_miembro: dict):
@@ -27,16 +27,23 @@ class MiembroOfercompas():
         self.email = hash_miembro["email"]
         self.contrasenia = hash_miembro["contrasenia"]
 
-    def hacer_json_token(self, token:str):
-        return json.dumps({"idMiembro": self.idMiembro,
+    def hacer_json_token(self, token: str):
+        return json.dumps({"idMiembro": int(self.idMiembro),
                            "nickname": self.nickname,
                            "email": self.email,
                            "contrasenia": self.contrasenia,
-                           "estado" : self.estado,
-                           "tipoMiembro" : self.tipoMiembro,
+                           "estado": self.estado,
+                           "tipoMiembro": self.tipoMiembro,
                            "token": token
                            })
 
+    def convertir_a_json_efra(self) -> dict:
+        diccionario = {}
+        atributos = ["idMiembro", "nickname", "email", "contrasenia"]
+        for key in atributos:
+            if key in self.__dict__.keys():
+                diccionario[key] = self.__getattribute__(key)
+        return diccionario
 
     def convertir_a_json(self, atributos: list) -> dict:
         diccionario = {}
@@ -132,7 +139,7 @@ class MiembroOfercompas():
         resultado = conexion.select(query, values)
 
         if len(resultado) > 0:
-            self.idMiembro = resultado[0]["idMiembro"]
+            self.idMiembro = int(resultado[0]["idMiembro"])
             self.tipoMiembro = resultado[0]["tipoMiembro"]
             self.nickname = resultado[0]["nickname"]
             status = CodigosRespuesta.OK

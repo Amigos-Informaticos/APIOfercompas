@@ -1,7 +1,3 @@
-from http import HTTPStatus
-
-from sqlalchemy.exc import SQLAlchemyError
-
 from src.datos.EasyConnection import EasyConnection
 from src.negocio.EstadoPublicacion import EstadoPublicacion
 from src.negocio.Puntuacion import Puntuacion
@@ -58,6 +54,9 @@ class Publicacion:
         values = [id_miembro, id_publicacion]
         resultado = conexion.select(query, values)
         return len(resultado) > 0
+
+    def obtener_puntuacion(self):
+        self.puntuacion = Puntuacion.calcular_puntuacion(self.idPublicacion)
 
 
 
