@@ -17,7 +17,8 @@ class Oferta(Publicacion):
 
     def convertir_a_json(self) -> dict:
         diccionario = {}
-        atributos = ["idPublicacion", "titulo", "descripcion", "fechaCreacion", "fechaFin", "precio", "vinculo", "puntuacion"]
+        atributos = ["idPublicacion", "titulo", "descripcion", "fechaCreacion", "fechaFin", "precio", "vinculo",
+                     "puntuacion"]
         for key in atributos:
             if key in self.__dict__.keys():
                 diccionario[key] = self.__getattribute__(key)
@@ -30,11 +31,12 @@ class Oferta(Publicacion):
         values = [self.titulo, self.descripcion, self.precio, self.fechaCreacion, self.fechaFin, self.categoria,
                   self.vinculo, self.publicador]
         print(values)
-        if conexion.send_query(query, values):
+        resultado = conexion.select(query, values)
+        if resultado:
+            self.idPublicacion = resultado[0]["idPublicacion"]
             respuesta = HTTPStatus.CREATED
         else:
             respuesta = HTTPStatus.BAD_REQUEST
-
         return respuesta
 
     def actualizar_oferta(self, id_publicacin: int) -> int:
@@ -92,9 +94,29 @@ class Oferta(Publicacion):
                 resultado.append(oferta_aux)
         return resultado
 
+    def construir_rutas(self, cantidad_imagenes: int) -> list:
+        total_imagenes = self.contar_imagenes()
+        lista_rutas = []
+        ruta_base = str(self.idPublicacion) + "/"
+        indice = 1
+        while indice <= cantidad_imagenes:
+            lista_rutas.append(ruta_base + str(total_imagenes + indice) + ".png")
+            indice += 1
 
+        return lista_rutas
 
+    def contar_imagenes(self):
+        conexion = EasyConnection()
+        query = "SELECT COUNT(id_imagen) AS CONTEO FROM Imagen WHERE id_publicacion = %s;"
+        values = [self.idPublicacion]
+        resultado = conexion.select(query, values)
+        return resultado[0]["CONTEO"]
 
-
-
-
+    def registrar_imagen(self, ruta) -> int:
+        resultado = HTTPStatus.INTERNAL_SERVER_ERROR
+        conexion = EasyConnection()
+        query = "INSERT INTO Imagen(ruta, id_publicacion) VALUES (%s, %s);"
+        values = [ruta, self.idPublicacion]
+        conexion.send_query(query, values)
+        resultado = HTTPStatus.CREATED
+        return resultado
