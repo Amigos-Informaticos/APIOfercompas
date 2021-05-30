@@ -17,7 +17,8 @@ class Oferta(Publicacion):
 
     def convertir_a_json(self) -> dict:
         diccionario = {}
-        atributos = ["idPublicacion", "titulo", "descripcion", "fechaCreacion", "fechaFin", "precio", "vinculo", "puntuacion"]
+        atributos = ["idPublicacion", "titulo", "descripcion", "fechaCreacion", "fechaFin", "precio", "vinculo",
+                     "puntuacion"]
         for key in atributos:
             if key in self.__dict__.keys():
                 diccionario[key] = self.__getattribute__(key)
@@ -95,7 +96,20 @@ class Oferta(Publicacion):
     def obtener_puntuacion(self):
         self.puntuacion = Puntuacion.calcular_puntuacion(self.idPublicacion)
 
+    def construir_rutas(self, cantidad_imagenes: int) -> list:
+        total_imagenes = self.contar_imagenes()
+        lista_rutas = []
+        ruta_base = str(self.idPublicacion) + "/"
+        indice = 1
+        while indice <= cantidad_imagenes:
+            lista_rutas.append(ruta_base + str(total_imagenes + indice) + ".png")
+            indice += 1
 
+        return lista_rutas
 
-
-
+    def contar_imagenes(self):
+        conexion = EasyConnection()
+        query = "SELECT COUNT(id_imagen) AS CONTEO FROM Imagen WHERE id_publicacion = %s;"
+        values = [self.idPublicacion]
+        resultado = conexion.select(query, values)
+        return resultado[0]["CONTEO"]

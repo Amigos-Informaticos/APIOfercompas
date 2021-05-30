@@ -17,6 +17,13 @@ def registrar_oferta():
     respuesta = Response(status=HTTPStatus.BAD_REQUEST)
     if oferta_recibida is not None:
         if all(llave in oferta_recibida for llave in valores_requeridos):
+            imagenes = []
+            for imagen in request.files.getlist("imagenes"):
+                imagenes.append(imagen)
+
+
+
+
             oferta = Oferta()
             oferta.titulo = oferta_recibida["titulo"]
             oferta.descripcion = oferta_recibida["descripcion"]
@@ -26,6 +33,11 @@ def registrar_oferta():
             oferta.publicador = oferta_recibida["publicador"]
             oferta.precio = oferta_recibida["precio"]
             oferta.vinculo = oferta_recibida["vinculo"]
+
+            rutas = oferta.construir_rutas(len(imagenes))
+
+
+
             status = oferta.registrar_oferta()
             if status == HTTPStatus.OK:
                 respuesta = Response(
