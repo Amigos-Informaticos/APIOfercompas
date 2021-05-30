@@ -18,7 +18,7 @@ class ServidorArchivos:
         self.conexion = Client(protocolo)
 
     def guardar_archivo(self, archivo: FileStorage, ruta: str):
-        imagen = Imagen(archivo, ruta)
+        imagen = Imagen(archivo.read(), ruta)
         self.transport.open()
         resultado = self.conexion.guardarArchivo(imagen)
         self.transport.close()
