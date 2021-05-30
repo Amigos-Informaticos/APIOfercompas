@@ -34,7 +34,7 @@ class Comentario():
         status = HTTPStatus.INTERNAL_SERVER_ERROR
         if self.existe_publicacion() and self.existe_miembro():
             conexion = EasyConnection()
-            query = "INSERT INTO Comentario(idMiembro, idOferta, contenido) VALUES" \
+            query = "INSERT INTO Comentario(idMiembro, idPublicacion, contenido) VALUES" \
                     "(%s, %s, %s)"
             values = [self.id_miembro, self.id_publicacion, self.contenido]
             conexion.send_query(query, values)
@@ -70,7 +70,7 @@ class Comentario():
         conexion = EasyConnection()
         query = "SELECT Comentario.contenido,MiembroOfercompas.nickname FROM Comentario INNER JOIN " \
                 "MiembroOfercompas ON Comentario.idMiembro=MiembroOfercompas.idMiembro " \
-                "WHERE idOferta = %s;"
+                "WHERE idPublicacion = %s;"
         values = [idPublicacion]
         comentarios_obtenidos = conexion.select(query, values)
         resultado = []
