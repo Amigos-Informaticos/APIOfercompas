@@ -31,7 +31,7 @@ class Publicacion:
     def eliminar_publicacion(id_publicacion: int) -> int:
         respuesta = 500
         conexion = EasyConnection()
-        query = "CALL SPA_eliminarPublicacion(%s)"
+        query = "CALL SPE_eliminarPublicacion(%s)"
         values = [id_publicacion]
         if conexion.send_query(query, values):
             respuesta = 204
@@ -57,7 +57,4 @@ class Publicacion:
 
     def obtener_puntuacion(self):
         self.puntuacion = Puntuacion.calcular_puntuacion(self.idPublicacion)
-
-
-
 
