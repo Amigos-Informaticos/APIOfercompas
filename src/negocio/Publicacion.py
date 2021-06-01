@@ -58,3 +58,27 @@ class Publicacion:
     def obtener_puntuacion(self):
         self.puntuacion = Puntuacion.calcular_puntuacion(self.idPublicacion)
 
+    @staticmethod
+    def obtener_publicaciones_denunciadas(pagina: int):
+        conexion = EasyConnection()
+        query = "CALL SPS_obtenerOfertasDenunciadas(%s)"
+        values = [pagina]
+        ofertas_obtenidas = conexion.select(query, values)
+        resultado = []
+        if ofertas_obtenidas:
+            for oferta_individual in ofertas_obtenidas:
+                oferta_aux = Publicacion()
+                oferta_aux.idPublicacion = oferta_individual["idPublicacion"]
+                oferta_aux.titulo = oferta_individual["titulo"]
+                oferta_aux.descripcion = oferta_individual["descripcion"]
+                oferta_aux.fechaCreacion = str(oferta_individual["fechaCreacion"])
+                oferta_aux.fechaFin = str(oferta_individual["fechaFin"])
+                oferta_aux.precio = oferta_individual["precio"]
+                oferta_aux.vinculo = oferta_individual["vinculo"]
+                oferta_aux.obtener_puntuacion()
+                resultado.append(oferta_aux)
+        return resultado
+
+
+
+
