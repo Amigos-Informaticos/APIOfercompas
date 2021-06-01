@@ -11,7 +11,7 @@ rutas_oferta = Blueprint("rutas_oferta", __name__)
 
 @rutas_oferta.route("/ofertas", methods=["POST"])
 def registrar_oferta():
-    oferta_recibida = request.json
+    oferta_recibida = request.form
     valores_requeridos = {"titulo", "descripcion", "precio", "fechaCreacion", "fechaFin", "publicador", "categoria",
                           "vinculo"}
     print(oferta_recibida)
@@ -32,7 +32,7 @@ def registrar_oferta():
             oferta.precio = oferta_recibida["precio"]
             oferta.vinculo = oferta_recibida["vinculo"]
             status = oferta.registrar_oferta()
-            if status == HTTPStatus.OK:
+            if status == HTTPStatus.CREATED:
                 rutas = oferta.construir_rutas(len(imagenes))
                 servidor = ServidorArchivos()
                 resultado = 0
