@@ -4,6 +4,7 @@ from http import HTTPStatus
 from flask import Blueprint, request, Response
 
 from src.negocio.Oferta import Oferta
+from src.transferencia_archivos.ServidorArchivos import ServidorArchivos
 
 rutas_oferta = Blueprint("rutas_oferta", __name__)
 
@@ -17,6 +18,10 @@ def registrar_oferta():
     respuesta = Response(status=HTTPStatus.BAD_REQUEST)
     if oferta_recibida is not None:
         if all(llave in oferta_recibida for llave in valores_requeridos):
+            imagenes = []
+            for imagen in request.files.getlist("imagenes"):
+                imagenes.append(imagen)
+
             oferta = Oferta()
             oferta.titulo = oferta_recibida["titulo"]
             oferta.descripcion = oferta_recibida["descripcion"]
@@ -28,11 +33,22 @@ def registrar_oferta():
             oferta.vinculo = oferta_recibida["vinculo"]
             status = oferta.registrar_oferta()
             if status == HTTPStatus.OK:
-                respuesta = Response(
-                    oferta.convertir_a_json(),
-                    status=status,
-                    mimetype="application/json"
-                )
+                rutas = oferta.construir_rutas(len(imagenes))
+                servidor = ServidorArchivos()
+                resultado = 0
+                indice = 0
+                while indice < len(imagenes) and resultado == 0:
+                    resultado = servidor.guardar_archivo(imagenes[indice], rutas[indice])
+                    if resultado == 0:
+                        oferta.registrar_imagen(rutas[indice])
+                    indice += 1
+
+                if resultado == 0:
+                    respuesta = Response(
+                        oferta.convertir_a_json(),
+                        status=status,
+                        mimetype="application/json"
+                    )
             else:
                 respuesta = Response(status=status)
         else:
