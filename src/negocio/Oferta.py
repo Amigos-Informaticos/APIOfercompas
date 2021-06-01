@@ -17,7 +17,7 @@ class Oferta(Publicacion):
 
     def convertir_a_json(self) -> dict:
         diccionario = {}
-        atributos = ["idPublicacion", "titulo", "descripcion", "fechaCreacion", "fechaFin", "precio", "vinculo", "puntuacion"]
+        atributos = ["idPublicacion", "titulo", "descripcion", "fechaCreacion", "fechaFin", "precio", "vinculo", "puntuacion", "publicador"]
         for key in atributos:
             if key in self.__dict__.keys():
                 diccionario[key] = self.__getattribute__(key)
@@ -67,6 +67,7 @@ class Oferta(Publicacion):
                 oferta_aux.fechaFin = str(oferta_individual["fechaFin"])
                 oferta_aux.precio = oferta_individual["precio"]
                 oferta_aux.vinculo = oferta_individual["vinculo"]
+                oferta_aux.publicador = oferta_individual["publicador"]
                 oferta_aux.obtener_puntuacion()
                 resultado.append(oferta_aux)
         return resultado
@@ -88,6 +89,7 @@ class Oferta(Publicacion):
                 oferta_aux.fechaFin = str(oferta_individual["fechaFin"])
                 oferta_aux.precio = oferta_individual["precio"]
                 oferta_aux.vinculo = oferta_individual["vinculo"]
+                oferta_aux.publicador = str(oferta_individual["publicador"])
                 oferta_aux.obtener_puntuacion()
                 resultado.append(oferta_aux)
         return resultado
