@@ -51,7 +51,7 @@ class Denuncia():
 
         return existe
 
-    def existe_publicacion(self)->bool:
+    def existe_publicacion(self) -> bool:
         existe = False
         query = "SELECT * FROM Publicacion WHERE idPublicacion = %s AND estado = 1;"
         values = [self.id_publicacion]
@@ -62,7 +62,7 @@ class Denuncia():
 
         return existe
 
-    def existe_miembro(self)->bool:
+    def existe_miembro(self) -> bool:
         existe = False
         query = "SELECT * FROM MiembroOfercompas WHERE idMiembro = %s;"
         values = [self.id_denunciante]
@@ -72,3 +72,15 @@ class Denuncia():
             existe = True
 
         return existe
+
+    def aumentar_numero_denuncias(self) -> bool:
+        aumentado = False
+        query_aumentar_denuncias = "UPDATE Publicacion set numeroDenuncias=numeroDenuncias+1 where " \
+                                   "idPublicacion = %s; "
+        values_aumentar_denuncias = [self.id_publicacion]
+        conexion = EasyConnection()
+        conexion.send_query(query_aumentar_denuncias, values_aumentar_denuncias)
+        aumentado = True
+        return aumentado
+
+

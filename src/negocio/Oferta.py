@@ -98,7 +98,7 @@ class Oferta(Publicacion):
     def construir_rutas(self, cantidad_imagenes: int) -> list:
         total_imagenes = self.contar_imagenes()
         lista_rutas = []
-        ruta_base = str(self.idPublicacion) + "/"
+        ruta_base = str(self.idPublicacion) + "-"
         indice = 1
         while indice <= cantidad_imagenes:
             lista_rutas.append(ruta_base + str(total_imagenes + indice) + ".png")
@@ -121,3 +121,5 @@ class Oferta(Publicacion):
         conexion.send_query(query, values)
         resultado = HTTPStatus.CREATED
         return resultado
+
+
