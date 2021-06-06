@@ -42,9 +42,7 @@ def registrar_miembro():
 def actualizar_miembro(old_email):
     valores_requeridos = {"email", "nickname", "contrasenia"}
     miembro_recibido = request.json
-    token = request.headers.get("token")
-    print("El token es:")
-    print(token)
+    print(miembro_recibido)
     respuesta = Response(CodigosRespuesta.MALA_SOLICITUD)
     if all(llave in miembro_recibido for llave in valores_requeridos):
         miembro = MiembroOfercompas()
