@@ -79,7 +79,7 @@ class Publicacion:
                 resultado.append(oferta_aux)
         return resultado
 
-    
+
 
 
 
