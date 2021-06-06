@@ -1,6 +1,7 @@
 from datetime import timedelta
 
 from flask import Flask
+from flask_cors import CORS
 
 from src.servicios.RutasCodigoDescuento import rutas_codigo
 from src.servicios.RutasComentario import rutas_comentario
@@ -10,7 +11,7 @@ from src.servicios.RutasOferta import rutas_oferta
 from src.servicios.RutasPublicacion import rutas_publicacion
 
 app = Flask(__name__)
-
+CORS(app, supports_credentials=True)
 app.register_blueprint(rutas_miembro)
 app.register_blueprint(rutas_oferta)
 app.register_blueprint(rutas_publicacion)

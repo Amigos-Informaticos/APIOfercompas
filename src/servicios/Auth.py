@@ -21,6 +21,8 @@ class Auth:
         def verify_auth(*args, **kwargs):
             token = request.headers.get("token")
             saved_token = None
+            print(token)
+            print(request.headers)
             try:
                 saved_token = session["token"]
                 if token is not None and saved_token is not None and token == saved_token:
