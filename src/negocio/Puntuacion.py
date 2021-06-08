@@ -28,7 +28,6 @@ class Puntuacion():
             conexion = EasyConnection()
             query = "INSERT INTO Puntuacion (idPuntuador, idPublicacion, esPositiva) VALUES (%s, %s, %s)"
             values = [self.id_puntuador, self.id_publicacion, self.es_positiva]
-            print(values)
             if conexion.send_query(query, values):
                 respuesta = HTTPStatus.CREATED
             else:
@@ -49,7 +48,6 @@ class Puntuacion():
         query = "SELECT COUNT(*) AS conteo FROM Puntuacion WHERE idPublicacion = %s AND esPositiva = 1"
         values = [id_publicacion]
         positivas = conexion.select(query, values)
-        print(positivas[0]["conteo"])
         query = "SELECT COUNT(*) AS conteo FROM Puntuacion WHERE idPublicacion = %s AND esPositiva = 0"
         negativas = conexion.select(query, values)
         total = positivas[0]["conteo"] - negativas[0]["conteo"]
