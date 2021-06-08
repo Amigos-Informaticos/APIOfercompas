@@ -25,9 +25,9 @@ class Comentario():
 
 
 
-    def instanciar_con_hashmap(self, hash_comentario: dict):
+    def instanciar_con_hashmap(self, hash_comentario: dict, id_publicacion):
         self.id_miembro = hash_comentario["idMiembro"]
-        self.id_publicacion = hash_comentario["idPublicacion"]
+        self.id_publicacion = id_publicacion
         self.contenido = hash_comentario["contenido"]
 
     def registrar(self) -> int:
