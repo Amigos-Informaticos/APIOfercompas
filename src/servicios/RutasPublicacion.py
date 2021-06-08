@@ -33,7 +33,6 @@ def obtener_interaccion(idPublicacion):
 def puntuar_publicacion(idPublicacion):
     puntuacion_recibida = request.json
     valores_requeridos = {"idMiembro", "esPositiva"}
-    print(puntuacion_recibida)
     respuesta = Response(status=HTTPStatus.BAD_REQUEST)
     if puntuacion_recibida is not None:
         if all(llave in puntuacion_recibida for llave in valores_requeridos):

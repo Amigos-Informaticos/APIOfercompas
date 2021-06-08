@@ -14,7 +14,6 @@ def registrar_oferta():
     oferta_recibida = request.form
     valores_requeridos = {"titulo", "descripcion", "precio", "fechaCreacion", "fechaFin", "publicador", "categoria",
                           "vinculo"}
-    print(oferta_recibida)
     respuesta = Response(status=HTTPStatus.BAD_REQUEST)
     if oferta_recibida is not None:
         if all(llave in oferta_recibida for llave in valores_requeridos):
@@ -106,8 +105,6 @@ def obtener_oferta():
         ofertas_jsons = []
         for oferta in ofertas:
             ofertas_jsons.append(oferta.convertir_a_json())
-        prueba = json.dumps(ofertas_jsons)
-        print(prueba)
         respuesta = Response(json.dumps(ofertas_jsons), status=HTTPStatus.OK, mimetype="application/json")
     else:
         respuesta = Response(status=HTTPStatus.NOT_FOUND)
