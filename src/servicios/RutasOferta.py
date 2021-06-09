@@ -11,7 +11,8 @@ rutas_oferta = Blueprint("rutas_oferta", __name__)
 
 @rutas_oferta.route("/ofertas", methods=["POST"])
 def registrar_oferta():
-    oferta_recibida = request.form
+    oferta_recibida = request.json
+    print(oferta_recibida)
     valores_requeridos = {"titulo", "descripcion", "precio", "fechaCreacion", "fechaFin", "publicador", "categoria",
                           "vinculo"}
     respuesta = Response(status=HTTPStatus.BAD_REQUEST)
@@ -32,22 +33,22 @@ def registrar_oferta():
             oferta.vinculo = oferta_recibida["vinculo"]
             status = oferta.registrar_oferta()
             if status == HTTPStatus.CREATED:
-                rutas = oferta.construir_rutas(len(imagenes))
-                servidor = ServidorArchivos()
-                resultado = 0
-                indice = 0
-                while indice < len(imagenes) and resultado == 0:
-                    resultado = servidor.guardar_archivo(imagenes[indice], rutas[indice])
-                    if resultado == 0:
-                        oferta.registrar_imagen(rutas[indice])
-                    indice += 1
-
-                if resultado == 0:
-                    respuesta = Response(
-                        oferta.convertir_a_json(),
-                        status=status,
-                        mimetype="application/json"
-                    )
+                # rutas = oferta.construir_rutas(len(imagenes))
+                # servidor = ServidorArchivos()
+                # resultado = 0
+                # indice = 0
+                # while indice < len(imagenes) and resultado == 0:
+                #     resultado = servidor.guardar_archivo(imagenes[indice], rutas[indice])
+                #     if resultado == 0:
+                #         oferta.registrar_imagen(rutas[indice])
+                #     indice += 1
+                #
+                # if resultado == 0:
+                respuesta = Response(
+                    json.dumps(oferta.convertir_a_json()),
+                    status=status,
+                    mimetype="application/json"
+                )
             else:
                 respuesta = Response(status=status)
         else:
@@ -88,7 +89,7 @@ def actualizar_oferta(idPublicacion):
 
 @rutas_oferta.route("/ofertas/<idPublicacion>", methods=["DELETE"])
 def eliminar_oferta(idPublicacion):
-    status = Oferta.eliminar_oferta(idPublicacion)
+    status = Oferta.eliminar_publicacion(idPublicacion)
     return Response(status=status)
 
 

@@ -34,7 +34,7 @@ class Publicacion:
         query = "CALL SPE_eliminarPublicacion(%s)"
         values = [id_publicacion]
         if conexion.send_query(query, values):
-            respuesta = 204
+            respuesta = 200
         else:
             respuesta = 400
 
