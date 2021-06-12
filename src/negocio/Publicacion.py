@@ -1,6 +1,9 @@
+from http import HTTPStatus
+
 from src.datos.EasyConnection import EasyConnection
 from src.negocio.EstadoPublicacion import EstadoPublicacion
 from src.negocio.Puntuacion import Puntuacion
+from src.transferencia_archivos.ServidorArchivos import ServidorArchivos
 
 
 class Publicacion:
@@ -79,10 +82,33 @@ class Publicacion:
                 resultado.append(oferta_aux)
         return resultado
 
+    def registrar_imagen(self, ruta: str) -> int:
+        resultado = HTTPStatus.INTERNAL_SERVER_ERROR
+        conexion = EasyConnection()
+        query = "INSERT INTO Multimedia(ruta, idOferta, tipo) VALUES (%s, %s, 'foto');"
+        values = [ruta, self.idPublicacion]
+        conexion.send_query(query, values)
+        resultado = HTTPStatus.CREATED
+        return resultado
 
+    def obtener_ruta_foto_id(self) -> str:
+        conexion = EasyConnection()
+        query = "SELECT ruta FROM Multimedia WHERE idOferta = %s AND tipo = 'foto'"
+        values = [self.idPublicacion]
+        ruta = conexion.select(query, values)
+        return ruta[0]["ruta"]
 
+    def recuperar_imagen(self):
+        servidor = ServidorArchivos()
+        resultado = servidor.obtener_archivos(self.obtener_ruta_foto_id())
+        imagen = resultado[0]
+        return imagen
 
-
-
-
-
+    def recuperar_imagenes_pagina(self, lista_ids):
+        servidor = ServidorArchivos()
+        imagenes = []
+        for id in lista_ids:
+            publicacion_aux = Publicacion()
+            publicacion_aux.idPublicacion = id
+            imagenes.append(publicacion_aux.recuperar_imagen())
+        return imagenes

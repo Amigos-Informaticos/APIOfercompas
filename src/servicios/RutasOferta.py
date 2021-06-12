@@ -18,9 +18,8 @@ def registrar_oferta():
     respuesta = Response(status=HTTPStatus.BAD_REQUEST)
     if oferta_recibida is not None:
         if all(llave in oferta_recibida for llave in valores_requeridos):
-            imagenes = []
-            for imagen in request.files.getlist("imagenes"):
-                imagenes.append(imagen)
+            foto = request.files.get("foto")
+            video = request.files.get("video")
 
             oferta = Oferta()
             oferta.titulo = oferta_recibida["titulo"]
@@ -33,26 +32,16 @@ def registrar_oferta():
             oferta.vinculo = oferta_recibida["vinculo"]
             status = oferta.registrar_oferta()
             if status == HTTPStatus.CREATED:
-                # rutas = oferta.construir_rutas(len(imagenes))
-                # servidor = ServidorArchivos()
-                # resultado = 0
-                # indice = 0
-                # while indice < len(imagenes) and resultado == 0:
-                #     resultado = servidor.guardar_archivo(imagenes[indice], rutas[indice])
-                #     if resultado == 0:
-                #         oferta.registrar_imagen(rutas[indice])
-                #     indice += 1
-                #
-                # if resultado == 0:
                 respuesta = Response(
                     json.dumps(oferta.convertir_a_json()),
-                    status=status,
-                    mimetype="application/json"
-                )
+                    status=HTTPStatus.CREATED,
+                    mimetype="application/json")
             else:
                 respuesta = Response(status=status)
         else:
             respuesta = Response(status=HTTPStatus.BAD_REQUEST)
+    else:
+        respuesta = Response(status=HTTPStatus.BAD_REQUEST)
 
     return respuesta
 
