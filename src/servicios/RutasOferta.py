@@ -11,6 +11,7 @@ from src.transferencia_archivos.ServidorArchivos import ServidorArchivos
 rutas_oferta = Blueprint("rutas_oferta", __name__)
 
 
+
 @rutas_oferta.route("/ofertas/<id_publicacion>/imagenes", methods=["POST"])
 def registrar_imagen(id_publicacion):
     status = HTTPStatus.BAD_REQUEST
@@ -125,6 +126,7 @@ def obtener_oferta():
         respuesta = Response(status=HTTPStatus.NOT_FOUND)
     return respuesta
 
+
 @rutas_oferta.route("/ofertas/<id_publicacion>/comentarios", methods=["POST"])
 def registrar_comentario(id_publicacion):
     comentario_recibido = request.json
@@ -162,6 +164,7 @@ def obtener_comentarios(id_publicacion):
             respuesta = Response(status=HTTPStatus.NOT_FOUND)
     return respuesta
 
+
 @rutas_oferta.route("/ofertas/<id_publicacion>/denuncias", methods=["POST"])
 def registrar_denuncia(id_publicacion):
     denuncia_recibida = request.json
@@ -171,13 +174,15 @@ def registrar_denuncia(id_publicacion):
     if denuncia_recibida is not None:
         if all(llave in denuncia_recibida for llave in valores_requeridos):
             denuncia = Denuncia()
-            denuncia.instanciar_con_hashmap(denuncia_recibida)
-            resultado = denuncia.registrar()
-            if resultado == HTTPStatus.CREATED:
-                respuesta = Response(denuncia.hacer_json(),
-                                     status=resultado,
-                                     mimetype="application/json")
+        denuncia.instanciar_con_hashmap(denuncia_recibida, id_publicacion)
+        resultado = denuncia.registrar()
+        if resultado == HTTPStatus.CREATED:
+            respuesta = Response(denuncia.hacer_json(),
+                                 status=resultado,
+                                 mimetype="application/json")
 
-            else:
-                respuesta = Response(status=resultado)
+        else:
+            respuesta = Response(status=resultado)
     return respuesta
+
+
