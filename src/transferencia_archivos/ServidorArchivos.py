@@ -31,6 +31,7 @@ class ServidorArchivos:
         return resultado
 
     def obtener_archivos(self, ruta: str) -> list:
+        print(ruta)
         self.transport.open()
         resultado = self.conexion.obtenerArchivos(ruta)
         self.transport.close()

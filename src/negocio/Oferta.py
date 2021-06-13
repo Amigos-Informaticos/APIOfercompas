@@ -17,10 +17,12 @@ class Oferta(Publicacion):
 
     def convertir_a_json(self) -> dict:
         diccionario = {}
-        atributos = ["idPublicacion", "titulo", "descripcion", "fechaCreacion", "fechaFin", "precio", "vinculo", "puntuacion", "publicador", "categoria"]
+        atributos = ["idPublicacion", "titulo", "descripcion", "fechaCreacion", "fechaFin", "precio", "vinculo",
+                     "puntuacion", "publicador", "categoria"]
         for key in atributos:
             if key in self.__dict__.keys():
                 diccionario[key] = self.__getattribute__(key)
+        diccionario["imagen"] = "http://127.0.0.1:5000/publicaciones/" + str(self.idPublicacion) + "/imagenes"
         return diccionario
 
     def registrar_oferta(self) -> int:
@@ -95,7 +97,7 @@ class Oferta(Publicacion):
                 resultado.append(oferta_aux)
         return resultado
 
-    def construir_rutas(self, cantidad_imagenes: int) -> list:
+    def construir_ruta(self, cantidad_imagenes: int) -> list:
         total_imagenes = self.contar_imagenes()
         lista_rutas = []
         ruta_base = str(self.idPublicacion) + "-"
@@ -112,14 +114,3 @@ class Oferta(Publicacion):
         values = [self.idPublicacion]
         resultado = conexion.select(query, values)
         return resultado[0]["CONTEO"]
-
-    def registrar_imagen(self, ruta) -> int:
-        resultado = HTTPStatus.INTERNAL_SERVER_ERROR
-        conexion = EasyConnection()
-        query = "INSERT INTO Imagen(ruta, id_publicacion) VALUES (%s, %s);"
-        values = [ruta, self.idPublicacion]
-        conexion.send_query(query, values)
-        resultado = HTTPStatus.CREATED
-        return resultado
-
-

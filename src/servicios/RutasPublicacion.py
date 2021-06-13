@@ -1,7 +1,8 @@
+import io
 import json
 from http import HTTPStatus
 
-from flask import Blueprint, Response, request
+from flask import Blueprint, Response, request, send_file
 
 from src.negocio.Oferta import Oferta
 from src.negocio.Publicacion import Publicacion
@@ -29,6 +30,7 @@ def obtener_interaccion(idPublicacion):
         respuesta = Response(status=HTTPStatus.NOT_FOUND)
     return respuesta
 
+
 @rutas_publicacion.route("/publicaciones/<idPublicacion>/puntuaciones", methods=["POST"])
 def puntuar_publicacion(idPublicacion):
     puntuacion_recibida = request.json
@@ -47,26 +49,38 @@ def puntuar_publicacion(idPublicacion):
                 respuesta = Response(status=resultado)
     return respuesta
 
+
 @rutas_publicacion.route("/ofertas/<idPublicacion>/imagenes", methods=["POST"])
 def publicar_imagen(idPublicacion):
-    imagenes = []
-    for imagen in request.files.getlist("imagenes"):
-        imagenes.append(imagen)
+    imagen = request.files.getlist("imagen")[0]
 
-    oferta = Oferta()
-    oferta.idPublicacion = 28
+    publicacion = Publicacion()
+    publicacion.idPublicacion = idPublicacion
+    print(publicacion.idPublicacion)
 
-    rutas = oferta.construir_rutas(len(imagenes))
+    ruta = str(idPublicacion + "-" + imagen.filename + "-foto.png")
     servidor = ServidorArchivos()
     resultado = 0
-    indice = 0
-    while indice < len(imagenes) and resultado == 0:
-        resultado = servidor.guardar_archivo(imagenes[indice], rutas[indice])
-        if resultado == 0:
-            oferta.registrar_imagen(rutas[indice])
-        indice += 1
+    resultado = servidor.guardar_archivo(imagen, ruta)
+    if resultado == 0:
+        publicacion.registrar_imagen(ruta)
 
-    return Response(status=200)
+    return Response(status=HTTPStatus.CREATED)
 
 
+@rutas_publicacion.route("/publicaciones/<idPublicacion>/imagenes", methods=["GET"])
+def recuperar_imagen(idPublicacion):
+    publicacion = Publicacion()
+    publicacion.idPublicacion = idPublicacion
+    resultado = publicacion.recuperar_imagen()
+    if resultado:
+        response = send_file(
+            io.BytesIO(resultado),
+            mimetype="image/png",
+            as_attachment=False)
+    return response
+
+@rutas_publicacion.route("/publicaciones/imagenes", methods=["GET"])
+def recuperar_imagenes_pagina():
+    lista_ids = request.json
 

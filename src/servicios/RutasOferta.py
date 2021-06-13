@@ -67,6 +67,8 @@ def registrar_oferta():
                 respuesta = Response(status=status)
         else:
             respuesta = Response(status=HTTPStatus.BAD_REQUEST)
+    else:
+        respuesta = Response(status=HTTPStatus.BAD_REQUEST)
 
     return respuesta
 
@@ -103,7 +105,7 @@ def actualizar_oferta(idPublicacion):
 
 @rutas_oferta.route("/ofertas/<idPublicacion>", methods=["DELETE"])
 def eliminar_oferta(idPublicacion):
-    status = Oferta.eliminar_oferta(idPublicacion)
+    status = Oferta.eliminar_publicacion(idPublicacion)
     return Response(status=status)
 
 
