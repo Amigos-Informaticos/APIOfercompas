@@ -6,10 +6,10 @@ from flask import Blueprint, request, Response
 from src.negocio.Comentario import Comentario
 from src.negocio.Denuncia import Denuncia
 from src.negocio.Oferta import Oferta
+from src.negocio.Publicacion import Publicacion
 from src.transferencia_archivos.ServidorArchivos import ServidorArchivos
 
 rutas_oferta = Blueprint("rutas_oferta", __name__)
-
 
 
 @rutas_oferta.route("/ofertas/<id_publicacion>/imagenes", methods=["POST"])
@@ -186,3 +186,15 @@ def registrar_denuncia(id_publicacion):
     return respuesta
 
 
+@rutas_oferta.route("/ofertas/<idPublicacion>/interaccion", methods=["GET"])
+def obtener_interaccion(idPublicacion):
+    respuesta = Response(status=HTTPStatus.OK)
+    id_miembro_recibido = int(request.headers.get("idMiembro"))
+    print("OBTENIENDO INTERACCION")
+    if id_miembro_recibido is not None:
+        id_miembro = id_miembro_recibido
+        respuesta = Response(json.dumps(Publicacion.obtener_interaccion(id_miembro, idPublicacion)),
+                             status=HTTPStatus.OK, mimetype="application/json")
+    else:
+        respuesta = Response(status=HTTPStatus.NOT_FOUND)
+    return respuesta
