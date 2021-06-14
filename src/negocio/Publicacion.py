@@ -96,7 +96,10 @@ class Publicacion:
         query = "SELECT ruta FROM Multimedia WHERE idOferta = %s AND tipo = 'foto'"
         values = [self.idPublicacion]
         ruta = conexion.select(query, values)
-        return ruta[0]["ruta"]
+        ruta_retorno = ""
+        if len(ruta) > 0:
+            ruta_retorno = ruta[0]["ruta"]
+        return ruta_retorno
 
     def recuperar_imagen(self):
         servidor = ServidorArchivos()

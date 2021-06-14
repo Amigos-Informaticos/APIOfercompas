@@ -50,22 +50,29 @@ def puntuar_publicacion(idPublicacion):
     return respuesta
 
 
-@rutas_publicacion.route("/ofertas/<idPublicacion>/imagenes", methods=["POST"])
+@rutas_publicacion.route("/publicaciones/<idPublicacion>/imagenes", methods=["POST"])
 def publicar_imagen(idPublicacion):
+    print(request.files)
     imagen = request.files.getlist("imagen")[0]
+    print("Archivo:"+ imagen.content_type)
+    respuesta = Response(status=HTTPStatus.BAD_REQUEST)
 
     publicacion = Publicacion()
     publicacion.idPublicacion = idPublicacion
     print(publicacion.idPublicacion)
-
-    ruta = str(idPublicacion + "-" + imagen.filename + "-foto.png")
+    if imagen.content_type == "image/png":
+        ruta = str(idPublicacion + "-" + imagen.filename + "-foto.png")
+    else:
+        ruta = str(idPublicacion + "-" + imagen.filename + "-video.mp4")
     servidor = ServidorArchivos()
     resultado = 0
     resultado = servidor.guardar_archivo(imagen, ruta)
     if resultado == 0:
         publicacion.registrar_imagen(ruta)
 
-    return Response(status=HTTPStatus.CREATED)
+    respuesta = Response(status=HTTPStatus.CREATED)
+
+    return respuesta
 
 
 @rutas_publicacion.route("/publicaciones/<idPublicacion>/imagenes", methods=["GET"])
@@ -73,6 +80,7 @@ def recuperar_imagen(idPublicacion):
     publicacion = Publicacion()
     publicacion.idPublicacion = idPublicacion
     resultado = publicacion.recuperar_imagen()
+    response = Response(status=HTTPStatus.NOT_FOUND)
     if resultado:
         response = send_file(
             io.BytesIO(resultado),
@@ -80,7 +88,19 @@ def recuperar_imagen(idPublicacion):
             as_attachment=False)
     return response
 
+@rutas_publicacion.route("/publicaciones/<idPublicacion>/videos", methods=["GET"])
+def recuperar_video(idPublicacion):
+    publicacion = Publicacion()
+    publicacion.idPublicacion = idPublicacion
+    resultado = publicacion.recuperar_imagen()
+    response = Response(status=HTTPStatus.NOT_FOUND)
+    if resultado:
+        response = send_file(
+            io.BytesIO(resultado),
+            mimetype="video/mp4",
+            as_attachment=False)
+    return response
+
 @rutas_publicacion.route("/publicaciones/imagenes", methods=["GET"])
 def recuperar_imagenes_pagina():
     lista_ids = request.json
-
