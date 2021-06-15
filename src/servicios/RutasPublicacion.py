@@ -1,7 +1,8 @@
+import io
 import json
 from http import HTTPStatus
 
-from flask import Blueprint, Response, request
+from flask import Blueprint, Response, request, send_file
 
 from src.negocio.Oferta import Oferta
 from src.negocio.Publicacion import Publicacion
@@ -124,3 +125,17 @@ def recuperar_video(idPublicacion):
 @rutas_publicacion.route("/publicaciones/imagenes", methods=["GET"])
 def recuperar_imagenes_pagina():
     lista_ids = request.json
+
+
+@rutas_publicacion.route("/publicaciones/<idPublicacion>/interaccion", methods=["GET"])
+def obtener_interaccion(idPublicacion):
+    respuesta = Response(status=HTTPStatus.OK)
+    id_miembro_recibido = int(request.headers.get("idMiembro"))
+    print("OBTENIENDO INTERACCION")
+    if id_miembro_recibido is not None:
+        id_miembro = id_miembro_recibido
+        respuesta = Response(json.dumps(Publicacion.obtener_interaccion(id_miembro, idPublicacion)),
+                             status=HTTPStatus.OK, mimetype="application/json")
+    else:
+        respuesta = Response(status=HTTPStatus.NOT_FOUND)
+    return respuesta

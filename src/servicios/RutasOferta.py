@@ -187,16 +187,3 @@ def registrar_denuncia(id_publicacion):
             respuesta = Response(status=resultado)
     return respuesta
 
-
-@rutas_oferta.route("/ofertas/<idPublicacion>/interaccion", methods=["GET"])
-def obtener_interaccion(idPublicacion):
-    respuesta = Response(status=HTTPStatus.OK)
-    id_miembro_recibido = int(request.headers.get("idMiembro"))
-    print("OBTENIENDO INTERACCION")
-    if id_miembro_recibido is not None:
-        id_miembro = id_miembro_recibido
-        respuesta = Response(json.dumps(Publicacion.obtener_interaccion(id_miembro, idPublicacion)),
-                             status=HTTPStatus.OK, mimetype="application/json")
-    else:
-        respuesta = Response(status=HTTPStatus.NOT_FOUND)
-    return respuesta
