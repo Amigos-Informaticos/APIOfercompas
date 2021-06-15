@@ -6,10 +6,10 @@ from flask import Blueprint, request, Response
 from src.negocio.Comentario import Comentario
 from src.negocio.Denuncia import Denuncia
 from src.negocio.Oferta import Oferta
+from src.negocio.Publicacion import Publicacion
 from src.transferencia_archivos.ServidorArchivos import ServidorArchivos
 
 rutas_oferta = Blueprint("rutas_oferta", __name__)
-
 
 
 @rutas_oferta.route("/ofertas/<id_publicacion>/imagenes", methods=["POST"])
@@ -186,5 +186,4 @@ def registrar_denuncia(id_publicacion):
         else:
             respuesta = Response(status=resultado)
     return respuesta
-
 

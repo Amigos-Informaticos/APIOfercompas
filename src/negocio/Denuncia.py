@@ -41,6 +41,14 @@ class Denuncia():
             status = HTTPStatus.NOT_FOUND
         return status
 
+    def aumentar_numero_denuncias_miembro(self, idMiembro: int):
+        aumentado = False;
+        query = "UPDATE MiembroOfercompas set numeroDenuncias=numeroDenuncias+1 where " \
+                                   "idPublicacion = %s; "
+
+
+
+
     def existe_denuncia(self) -> bool:
         existe = False
         query = "SELECT * FROM Denuncia WHERE idPublicacion = %s and idMiembro = %s;"
