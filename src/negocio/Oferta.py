@@ -72,7 +72,7 @@ class Oferta(Publicacion):
                 oferta_aux.precio = oferta_individual["precio"]
                 oferta_aux.vinculo = oferta_individual["vinculo"]
                 oferta_aux.publicador = oferta_individual["publicador"]
-                oferta_aux.obtener_puntuacion()
+                oferta_aux.puntuacion = oferta_individual["puntuacion"]
                 resultado.append(oferta_aux)
         return resultado
 
@@ -109,9 +109,4 @@ class Oferta(Publicacion):
 
         return lista_rutas
 
-    def contar_imagenes(self):
-        conexion = EasyConnection()
-        query = "SELECT COUNT(id_imagen) AS CONTEO FROM Imagen WHERE id_publicacion = %s;"
-        values = [self.idPublicacion]
-        resultado = conexion.select(query, values)
-        return resultado[0]["CONTEO"]
+
