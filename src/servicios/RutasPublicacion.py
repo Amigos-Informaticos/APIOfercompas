@@ -19,23 +19,6 @@ def eliminar_publicacion(idPublicacion):
     return Response(status=status)
 
 
-@rutas_publicacion.route("/publicaciones/<idPublicacion>/interaccion", methods=["GET"])
-def obtener_interaccion(idPublicacion):
-    print("OBTENIENDO INTERACCION")
-    payload = request.json
-    print(request)
-    print(payload)
-    valores_requeridos = ["idMiembro"]
-    if payload is not None:
-        if all(llave in payload for llave in valores_requeridos):
-            id_miembro = payload.get("idMiembro")
-            respuesta = Response(json.dumps(Publicacion.obtener_interaccion(id_miembro, idPublicacion)),
-                             status=HTTPStatus.OK)
-    else:
-        respuesta = Response(status=HTTPStatus.NOT_FOUND)
-    return respuesta
-
-
 @rutas_publicacion.route("/publicaciones/<idPublicacion>/puntuaciones", methods=["POST"])
 def puntuar_publicacion(idPublicacion):
     puntuacion_recibida = request.json
