@@ -29,7 +29,18 @@ class Puntuacion():
             query = "INSERT INTO Puntuacion (idPuntuador, idPublicacion, esPositiva) VALUES (%s, %s, %s)"
             values = [self.id_puntuador, self.id_publicacion, self.es_positiva]
             if conexion.send_query(query, values):
-                respuesta = HTTPStatus.CREATED
+
+                query=""
+                if self.es_positiva:
+                    query = "UPDATE Publicacion SET puntuacion = puntuacion+1 WHERE idPublicacion = %s"
+                else:
+                    query = "UPDATE Publicacion SET puntuacion = puntuacion-1 WHERE idPublicacion = %s"
+
+                values=[self.id_publicacion]
+                if conexion.send_query(query, values):
+                    respuesta = HTTPStatus.CREATED
+                else:
+                    respuesta = HTTPStatus.CONFLICT
             else:
                 respuesta = HTTPStatus.INTERNAL_SERVER_ERROR
         return respuesta
