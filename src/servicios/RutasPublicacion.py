@@ -19,12 +19,17 @@ def eliminar_publicacion(idPublicacion):
     return Response(status=status)
 
 
-@rutas_publicacion.route("/publicaciones/<idPublicacion>", methods=["GET"])
+@rutas_publicacion.route("/publicaciones/<idPublicacion>/interaccion", methods=["GET"])
 def obtener_interaccion(idPublicacion):
-    parametros = request.headers
-    if "idMiembro" in parametros:
-        id_miembro = parametros.get("idMiembro")
-        respuesta = Response(json.dumps(Publicacion.obtener_interaccion(id_miembro, idPublicacion)),
+    print("OBTENIENDO INTERACCION")
+    payload = request.json
+    print(request)
+    print(payload)
+    valores_requeridos = ["idMiembro"]
+    if payload is not None:
+        if all(llave in payload for llave in valores_requeridos):
+            id_miembro = payload.get("idMiembro")
+            respuesta = Response(json.dumps(Publicacion.obtener_interaccion(id_miembro, idPublicacion)),
                              status=HTTPStatus.OK)
     else:
         respuesta = Response(status=HTTPStatus.NOT_FOUND)
@@ -120,3 +125,17 @@ def recuperar_video(idPublicacion):
 @rutas_publicacion.route("/publicaciones/imagenes", methods=["GET"])
 def recuperar_imagenes_pagina():
     lista_ids = request.json
+
+
+@rutas_publicacion.route("/publicaciones/<idPublicacion>/interaccion", methods=["GET"])
+def obtener_interaccion(idPublicacion):
+    respuesta = Response(status=HTTPStatus.OK)
+    id_miembro_recibido = int(request.headers.get("idMiembro"))
+    print("OBTENIENDO INTERACCION")
+    if id_miembro_recibido is not None:
+        id_miembro = id_miembro_recibido
+        respuesta = Response(json.dumps(Publicacion.obtener_interaccion(id_miembro, idPublicacion)),
+                             status=HTTPStatus.OK, mimetype="application/json")
+    else:
+        respuesta = Response(status=HTTPStatus.NOT_FOUND)
+    return respuesta

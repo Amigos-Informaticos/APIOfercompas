@@ -18,8 +18,8 @@ class Denuncia():
                            "motivo": self.motivo
                            })
 
-    def instanciar_con_hashmap(self, hash_denuncia: dict):
-        self.id_publicacion = hash_denuncia["idPublicacion"]
+    def instanciar_con_hashmap(self, hash_denuncia: dict, id_publicacion):
+        self.id_publicacion = id_publicacion
         self.id_denunciante = hash_denuncia["idDenunciante"]
         self.comentario = hash_denuncia["comentario"]
         self.motivo = hash_denuncia["motivo"]
@@ -33,12 +33,21 @@ class Denuncia():
                         "(%s,%s, %s, %s);"
                 values = [self.id_denunciante, self.id_publicacion, self.comentario, self.motivo]
                 conexion.send_query(query, values)
+                self.aumentar_numero_denuncias()
                 status = HTTPStatus.CREATED
             else:
                 status = HTTPStatus.CONFLICT
         else:
             status = HTTPStatus.NOT_FOUND
         return status
+
+    def aumentar_numero_denuncias_miembro(self, idMiembro: int):
+        aumentado = False;
+        query = "UPDATE MiembroOfercompas set numeroDenuncias=numeroDenuncias+1 where " \
+                                   "idPublicacion = %s; "
+
+
+
 
     def existe_denuncia(self) -> bool:
         existe = False

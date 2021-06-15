@@ -6,6 +6,7 @@ from flask import Blueprint, request, Response
 from src.negocio.Comentario import Comentario
 from src.negocio.Denuncia import Denuncia
 from src.negocio.Oferta import Oferta
+from src.negocio.Publicacion import Publicacion
 from src.transferencia_archivos.ServidorArchivos import ServidorArchivos
 
 rutas_oferta = Blueprint("rutas_oferta", __name__)
@@ -127,6 +128,7 @@ def obtener_oferta():
         respuesta = Response(status=HTTPStatus.NOT_FOUND)
     return respuesta
 
+
 @rutas_oferta.route("/ofertas/<id_publicacion>/comentarios", methods=["POST"])
 def registrar_comentario(id_publicacion):
     comentario_recibido = request.json
@@ -164,6 +166,7 @@ def obtener_comentarios(id_publicacion):
             respuesta = Response(status=HTTPStatus.NOT_FOUND)
     return respuesta
 
+
 @rutas_oferta.route("/ofertas/<id_publicacion>/denuncias", methods=["POST"])
 def registrar_denuncia(id_publicacion):
     denuncia_recibida = request.json
@@ -173,13 +176,14 @@ def registrar_denuncia(id_publicacion):
     if denuncia_recibida is not None:
         if all(llave in denuncia_recibida for llave in valores_requeridos):
             denuncia = Denuncia()
-            denuncia.instanciar_con_hashmap(denuncia_recibida)
-            resultado = denuncia.registrar()
-            if resultado == HTTPStatus.CREATED:
-                respuesta = Response(denuncia.hacer_json(),
-                                     status=resultado,
-                                     mimetype="application/json")
+        denuncia.instanciar_con_hashmap(denuncia_recibida, id_publicacion)
+        resultado = denuncia.registrar()
+        if resultado == HTTPStatus.CREATED:
+            respuesta = Response(denuncia.hacer_json(),
+                                 status=resultado,
+                                 mimetype="application/json")
 
-            else:
-                respuesta = Response(status=resultado)
+        else:
+            respuesta = Response(status=resultado)
     return respuesta
+
