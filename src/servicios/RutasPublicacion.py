@@ -54,27 +54,31 @@ def puntuar_publicacion(idPublicacion):
     return respuesta
 
 
-@rutas_publicacion.route("/publicaciones/<idPublicacion>/imagenes", methods=["POST"])
-def publicar_imagen(idPublicacion):
+@rutas_publicacion.route("/publicaciones/<idPublicacion>/multimedia", methods=["POST"])
+def publicar_archivo(idPublicacion):
     print(request.files)
-    imagen = request.files.getlist("imagen")[0]
-    print("Archivo:"+ imagen.content_type)
+    archivo = request.files.getlist("imagen")[0]
+    print("Archivo:" + archivo.content_type)
     respuesta = Response(status=HTTPStatus.BAD_REQUEST)
 
     publicacion = Publicacion()
     publicacion.idPublicacion = idPublicacion
     print(publicacion.idPublicacion)
-    if imagen.content_type == "image/png":
-        ruta = str(idPublicacion + "-" + imagen.filename + "-foto.png")
-    else:
-        ruta = str(idPublicacion + "-" + imagen.filename + "-video.mp4")
     servidor = ServidorArchivos()
     resultado = 0
-    resultado = servidor.guardar_archivo(imagen, ruta)
-    if resultado == 0:
-        publicacion.registrar_imagen(ruta)
-
-    respuesta = Response(status=HTTPStatus.CREATED)
+    print("ARCHIVOOOO: "+archivo.content_type)
+    if archivo.content_type == "image/png" or archivo.content_type == "image/jpeg":
+        ruta = str(idPublicacion + "-" + archivo.filename)
+        resultado = servidor.guardar_archivo(archivo, ruta)
+        if resultado == 0:
+            publicacion.registrar_imagen(ruta)
+            respuesta = Response(status=HTTPStatus.CREATED)
+    else:
+        ruta = str(idPublicacion + "-" + archivo.filename)
+        resultado = servidor.guardar_archivo(archivo, ruta)
+        if resultado == 0:
+            publicacion.registrar_video(ruta)
+            respuesta = Response(status=HTTPStatus.CREATED)
 
     return respuesta
 
@@ -83,27 +87,39 @@ def publicar_imagen(idPublicacion):
 def recuperar_imagen(idPublicacion):
     publicacion = Publicacion()
     publicacion.idPublicacion = idPublicacion
-    resultado = publicacion.recuperar_imagen()
     response = Response(status=HTTPStatus.NOT_FOUND)
-    if resultado:
-        response = send_file(
-            io.BytesIO(resultado),
-            mimetype="image/png",
-            as_attachment=False)
+    ruta_foto = publicacion.obtener_ruta_foto_id()
+    print("CACA:" + ruta_foto)
+    if ruta_foto != "not":
+        print("ENTRÓ!!!!!!!!")
+        resultado = publicacion.recuperar_archivo(ruta_foto)
+        if resultado:
+            response = send_file(
+                io.BytesIO(resultado),
+                mimetype="image/png",
+                as_attachment=False)
+
     return response
+
 
 @rutas_publicacion.route("/publicaciones/<idPublicacion>/videos", methods=["GET"])
 def recuperar_video(idPublicacion):
     publicacion = Publicacion()
     publicacion.idPublicacion = idPublicacion
-    resultado = publicacion.recuperar_imagen()
     response = Response(status=HTTPStatus.NOT_FOUND)
-    if resultado:
-        response = send_file(
-            io.BytesIO(resultado),
-            mimetype="video/mp4",
-            as_attachment=False)
+    ruta_video = publicacion.obtener_ruta_video_id()
+    print("PIPI:" + ruta_video)
+    if ruta_video != "not":
+        print("VIDEO!!!!!!!!")
+        resultado = publicacion.recuperar_archivo(ruta_video)
+        if resultado:
+            response = send_file(
+                io.BytesIO(resultado),
+                mimetype="video/mp4",
+                as_attachment=False)
+
     return response
+
 
 @rutas_publicacion.route("/publicaciones/imagenes", methods=["GET"])
 def recuperar_imagenes_pagina():
