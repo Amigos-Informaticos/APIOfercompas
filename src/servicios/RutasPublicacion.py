@@ -1,29 +1,34 @@
-import io
 import json
 from http import HTTPStatus
 
-from flask import Blueprint, Response, request, send_file
+from flask import Blueprint, Response, request
 
 from src.negocio.Comentario import Comentario
 from src.negocio.Denuncia import Denuncia
-from src.negocio.Oferta import Oferta
 from src.negocio.Publicacion import Publicacion
 from src.negocio.Puntuacion import Puntuacion
 from src.servicios.Auth import Auth
-from src.transferencia_archivos.ServidorArchivos import ServidorArchivos
 
 rutas_publicacion = Blueprint("rutas_publicacion", __name__)
 
 
 @rutas_publicacion.route("/publicaciones/<idPublicacion>", methods=["DELETE"])
+@Auth.requires_token
 def eliminar_publicacion(idPublicacion):
-    status = Publicacion.eliminar_publicacion(idPublicacion)
+    publicacion = Publicacion()
+    publicacion.idPublicacion = idPublicacion
+    publicacion.obtener_autor_por_id()
+    token = request.headers.get("token")
+    if Auth.verificar_autor(publicacion.obtener_autor_por_id(), token):
+        status = Publicacion.eliminar_publicacion(idPublicacion)
+    else:
+        status = HTTPStatus.UNAUTHORIZED
+
     return Response(status=status)
 
 
-
-
 @rutas_publicacion.route("/publicaciones/<idPublicacion>/puntuaciones", methods=["POST"])
+@Auth.requires_token
 def puntuar_publicacion(idPublicacion):
     puntuacion_recibida = request.json
     valores_requeridos = {"idMiembro", "esPositiva"}
@@ -42,79 +47,9 @@ def puntuar_publicacion(idPublicacion):
     return respuesta
 
 
-@rutas_publicacion.route("/publicaciones/<idPublicacion>/multimedia", methods=["POST"])
-def publicar_archivo(idPublicacion):
-    print(request.files)
-    archivo = request.files.getlist("imagen")[0]
-    print("Archivo:" + archivo.content_type)
-    respuesta = Response(status=HTTPStatus.BAD_REQUEST)
-
-    publicacion = Publicacion()
-    publicacion.idPublicacion = idPublicacion
-    print(publicacion.idPublicacion)
-    servidor = ServidorArchivos()
-    resultado = 0
-    print("ARCHIVOOOO: "+archivo.content_type)
-    if archivo.content_type == "image/png" or archivo.content_type == "image/jpeg":
-        ruta = str(idPublicacion + "-" + archivo.filename)
-        resultado = servidor.guardar_archivo(archivo, ruta)
-        if resultado == 0:
-            publicacion.registrar_imagen(ruta)
-            respuesta = Response(status=HTTPStatus.CREATED)
-    else:
-        ruta = str(idPublicacion + "-" + archivo.filename)
-        resultado = servidor.guardar_archivo(archivo, ruta)
-        if resultado == 0:
-            publicacion.registrar_video(ruta)
-            respuesta = Response(status=HTTPStatus.CREATED)
-
-    return respuesta
-
-
-@rutas_publicacion.route("/publicaciones/<idPublicacion>/imagenes", methods=["GET"])
-def recuperar_imagen(idPublicacion):
-    publicacion = Publicacion()
-    publicacion.idPublicacion = idPublicacion
-    response = Response(status=HTTPStatus.NOT_FOUND)
-    ruta_foto = publicacion.obtener_ruta_foto_id()
-    print("CACA:" + ruta_foto)
-    if ruta_foto != "not":
-        print("ENTRÓ!!!!!!!!")
-        resultado = publicacion.recuperar_archivo(ruta_foto)
-        if resultado:
-            response = send_file(
-                io.BytesIO(resultado),
-                mimetype="image/png",
-                as_attachment=False)
-
-    return response
-
-
-@rutas_publicacion.route("/publicaciones/<idPublicacion>/videos", methods=["GET"])
-def recuperar_video(idPublicacion):
-    publicacion = Publicacion()
-    publicacion.idPublicacion = idPublicacion
-    response = Response(status=HTTPStatus.NOT_FOUND)
-    ruta_video = publicacion.obtener_ruta_video_id()
-    print("PIPI:" + ruta_video)
-    if ruta_video != "not":
-        print("VIDEO!!!!!!!!")
-        resultado = publicacion.recuperar_archivo(ruta_video)
-        if resultado:
-            response = send_file(
-                io.BytesIO(resultado),
-                mimetype="video/mp4",
-                as_attachment=False)
-
-    return response
-
-
-@rutas_publicacion.route("/publicaciones/imagenes", methods=["GET"])
-def recuperar_imagenes_pagina():
-    lista_ids = request.json
-
 
 @rutas_publicacion.route("/publicaciones/<idPublicacion>/interaccion", methods=["GET"])
+@Auth.requires_token
 def obtener_interaccion(idPublicacion):
     respuesta = Response(status=HTTPStatus.OK)
     id_miembro_recibido = int(request.headers.get("idMiembro"))
@@ -127,7 +62,9 @@ def obtener_interaccion(idPublicacion):
         respuesta = Response(status=HTTPStatus.NOT_FOUND)
     return respuesta
 
+
 @rutas_publicacion.route("/publicaciones/<id_publicacion>/comentarios", methods=["POST"])
+@Auth.requires_token
 def registrar_comentario(id_publicacion):
     comentario_recibido = request.json
     valores_requeridos = {"idMiembro", "contenido"}
@@ -165,7 +102,9 @@ def obtener_comentarios(id_publicacion):
     return respuesta
 
 
+
 @rutas_publicacion.route("/publicaciones/<id_publicacion>/denuncias", methods=["POST"])
+@Auth.requires_token
 def registrar_denuncia(id_publicacion):
     denuncia_recibida = request.json
     valores_requeridos = {"idDenunciante", "comentario", "motivo"}
