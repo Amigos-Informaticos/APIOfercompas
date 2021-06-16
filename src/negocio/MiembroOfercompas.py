@@ -146,3 +146,63 @@ class MiembroOfercompas():
         else:
             status = CodigosRespuesta.NO_ENCONTRADO
         return status
+
+    @staticmethod
+    def obtener_miembros_mas_denunciados():
+        query = "SELECT nickname, idMiembro, denuncias FROM MiembroOfercompas INNER JOIN" \
+                " (SELECT publicador, COUNT(idPublicacion) AS denuncias FROM Publicacion WHERE" \
+                " numeroDenuncias > 0 GROUP BY publicador ORDER BY COUNT(idPublicacion) DESC LIMIT 10)" \
+                " AS DENUNCIAS ON idMiembro = DENUNCIAS.publicador;"
+        conexion = EasyConnection()
+        resultado = conexion.select(query)
+        return resultado
+
+    @staticmethod
+    def obtener_reporte(id_miembro: int) -> dict:
+        queryTolalPublicaciones = "SELECT COUNT(publicador) AS numeroPublicaciones FROM  Publicacion WHERE" \
+                                  " publicador = %s;"
+        queryTotalDenuncias = "SELECT SUM(numeroDenuncias) AS numeroDenuncias FROM  Publicacion WHERE publicador = %s;"
+        queryTotalPuntuacion = "SELECT SUM(puntuacion) AS PuntuacionTotal FROM Publicacion WHERE publicador = %s;"
+        queryTotalPublicacionesPositivas = "SELECT count(publicador) AS publicacionesPositivas FROM Publicacion " \
+                                           "WHERE publicador = %s AND puntuacion >= 0;"
+
+        values = [id_miembro]
+        totalPublicaciones = 0
+        totalDenuncias = 0
+        totalPuntuacion = 0
+        totalPublicacionesPositivas = 0;
+        conexion = EasyConnection()
+        resultado = conexion.select(queryTolalPublicaciones, values)
+        if resultado:
+            if resultado[0]["numeroPublicaciones"]:
+                totalPublicaciones = int(resultado[0]["numeroPublicaciones"])
+
+        resultado = conexion.select(queryTotalPuntuacion, values)
+
+        if resultado:
+            if resultado[0]["PuntuacionTotal"]:
+                totalPuntuacion = int(resultado[0]["PuntuacionTotal"])
+
+        resultado = conexion.select(queryTotalDenuncias, values)
+
+        if resultado:
+            if resultado[0]["numeroDenuncias"]:
+                totalDenuncias = int(resultado[0]["numeroDenuncias"])
+
+        resultado
+
+        resultado = conexion.select(queryTotalPublicacionesPositivas, values)
+        if resultado:
+            if resultado[0]["publicacionesPositivas"]:
+                totalPublicacionesPositivas = int(resultado[0]["publicacionesPositivas"])
+
+        respuesta = {"numeroTotalPublicaciones": totalPublicaciones,
+                     "puntuacionTotal": totalPuntuacion,
+                     "numeroDenuncias": totalDenuncias,
+                     "publicacionesPositivas": totalPublicacionesPositivas
+                     }
+        return respuesta
+
+
+
+
