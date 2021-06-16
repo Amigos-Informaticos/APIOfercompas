@@ -11,6 +11,7 @@ rutas_codigo = Blueprint("rutas_codigo", __name__)
 
 
 @rutas_codigo.route("/codigos", methods=["POST"])
+@Auth.requires_token
 def registrar_codigo():
     codigo_recibido = request.json
     valores_requeridos = {"titulo", "descripcion", "codigo", "fechaCreacion", "fechaFin", "publicador", "categoria"}
@@ -49,6 +50,7 @@ def registrar_codigo():
 
 
 @rutas_codigo.route("/codigos/<idPublicacion>", methods=["PUT"])
+@Auth.requires_token
 def actualizar_codigo(idPublicacion):
     codigo_recibido = request.json
     valores_requeridos = {"titulo", "descripcion", "codigo", "fechaCreacion", "fechaFin", "categoria"}
@@ -56,6 +58,7 @@ def actualizar_codigo(idPublicacion):
     if codigo_recibido is not None:
         if all(llave in codigo_recibido for llave in valores_requeridos):
             codigo_descuento = CodigoDescuento()
+            codigo_descuento.idPublicacion = idPublicacion
             codigo_descuento.titulo = codigo_recibido["titulo"]
             codigo_descuento.descripcion = codigo_recibido["descripcion"]
             codigo_descuento.fechaCreacion = codigo_recibido["fechaCreacion"]
@@ -63,28 +66,29 @@ def actualizar_codigo(idPublicacion):
             codigo_descuento.categoria = codigo_recibido["categoria"]
             codigo_descuento.codigo = codigo_recibido["codigo"]
             status = codigo_descuento.actualizar_codigo(idPublicacion)
-            if status == RECURSO_CREADO:
-                respuesta = Response(
-                    json.dumps(codigo_descuento.convertir_a_json(
-                        ["idPublicacion", "titulo", "descripcion", "codigo", "fechaCreacion", "fechaFin",
-                         "categoria"])),
-                    status=status,
-                    mimetype="application/json"
-                )
+
+            token = request.headers.get("token")
+            if Auth.verificar_autor(codigo_descuento.obtener_autor_por_id(), token):
+                if status == HTTPStatus.OK:
+                    respuesta = Response(
+                        json.dumps(codigo_descuento.convertir_a_json(
+                            ["idPublicacion", "titulo", "descripcion", "codigo", "fechaCreacion", "fechaFin",
+                             "categoria"])),
+                        status=status,
+                        mimetype="application/json"
+                    )
+                else:
+                    respuesta = Response(status=status)
             else:
-                respuesta = Response(status=status)
+                respuesta = Response(status=HTTPStatus.FORBIDDEN)
         else:
             respuesta = Response(status=MALA_SOLICITUD)
 
     return respuesta
 
 
-@rutas_codigo.route("/codigos/<idPublicacion>", methods=["DELETE"])
-def eliminar_codigo(idPublicacion):
-    status = CodigoDescuento.eliminar_codigo(idPublicacion)
-    return Response(status=status)
-
 @rutas_codigo.route("/codigos", methods=["GET"])
+@Auth.requires_token
 def obtener_codigo():
     pagina = request.args.get("pagina", default=1, type=int)
     categoria = request.args.get("categoria", default=-1, type=int)

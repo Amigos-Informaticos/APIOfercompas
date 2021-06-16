@@ -1,3 +1,5 @@
+from http import HTTPStatus
+
 from src.datos.EasyConnection import EasyConnection
 from src.negocio.Publicacion import Publicacion
 
@@ -25,22 +27,22 @@ class CodigoDescuento(Publicacion):
         values = [self.titulo, self.descripcion, self.fechaCreacion, self.fechaFin, self.categoria,
                   self.codigo, self.publicador]
         if conexion.send_query(query, values):
-            respuesta = 201
+            respuesta = HTTPStatus.CREATED
         else:
             respuesta = 400
 
         return respuesta
 
     def actualizar_codigo(self, id_publicacin: int) -> int:
-        respuesta = 500
+        respuesta = HTTPStatus.INTERNAL_SERVER_ERROR
         conexion = EasyConnection()
         query = "CALL SPA_actualizarCodigoDescuento(%s, %s, %s, %s, %s, %s, %s)"
         values = [id_publicacin, self.titulo, self.descripcion, self.fechaCreacion,
                   self.fechaFin, self.categoria, self.codigo]
         if conexion.send_query(query, values):
-            respuesta = 200
+            respuesta = HTTPStatus.OK
         else:
-            respuesta = 400
+            respuesta = HTTPStatus.BAD_REQUEST
 
         return respuesta
 

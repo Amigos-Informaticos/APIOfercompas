@@ -5,6 +5,7 @@ from flask_cors import CORS
 
 from src.servicios.RutasCodigoDescuento import rutas_codigo
 from src.servicios.RutasMiembroOfercompas import rutas_miembro
+from src.servicios.RutasMultimedia import rutas_multimedia
 from src.servicios.RutasOferta import rutas_oferta
 from src.servicios.RutasPublicacion import rutas_publicacion
 

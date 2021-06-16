@@ -2,7 +2,7 @@ from datetime import datetime
 from functools import update_wrapper
 from typing import Any
 
-from cryptography.fernet import Fernet
+from cryptography.fernet import Fernet, InvalidToken
 from flask import session, Response, request
 
 from src.negocio.CodigosRespuesta import NO_AUTORIZADO, PROHIBIDO, SESION_EXPIRADA
@@ -21,8 +21,6 @@ class Auth:
         def verify_auth(*args, **kwargs):
             token = request.headers.get("token")
             saved_token = None
-            print(token)
-            print(request.headers)
             try:
                 saved_token = session["token"]
                 if token is not None and saved_token is not None and token == saved_token:
@@ -59,6 +57,17 @@ class Auth:
         return decorator
 
     @staticmethod
+    def verificar_autor(idPublicador, token):
+        response = None
+        if token is not None:
+            try:
+                values = Auth.decode_token(token)
+                response = str(values["id_miembro"]) == str(idPublicador)
+            except InvalidToken:
+                pass
+            return response
+
+    @staticmethod
     def generate_token(miembro_ofercompas: MiembroOfercompas) -> str:
         if Auth.secret_password is None:
             Auth.set_password()
@@ -66,17 +75,21 @@ class Auth:
         value: str = miembro_ofercompas.email + "/"
         value += miembro_ofercompas.contrasenia + "/"
         value += str(int(miembro_ofercompas.tipoMiembro)) + "/"
+        value += str(int(miembro_ofercompas.idMiembro)) + "/"
         value += timestamp
         return Auth.encode(value, Auth.secret_password)
 
     @staticmethod
     def decode_token(token: str) -> dict:
+        if Auth.secret_password is None:
+            Auth.set_password()
         decoded_token = Auth.decode(token, Auth.secret_password)
         decoded_token = decoded_token.split("/")
         return {
             "email": decoded_token[0],
             "contrasenia": decoded_token[1],
-            "tipo_miembro": decoded_token[2]
+            "tipo_miembro": decoded_token[2],
+            "id_miembro": decoded_token[3]
         }
 
     @staticmethod
