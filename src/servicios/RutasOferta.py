@@ -76,6 +76,8 @@ def registrar_oferta():
 @rutas_oferta.route("/ofertas/<idPublicacion>", methods=["PUT"])
 @Auth.requires_token
 def actualizar_oferta(idPublicacion):
+    print("IDDDDD")
+    print(idPublicacion)
     oferta_recibida = request.json
     valores_requeridos = {"titulo", "descripcion", "precio", "fechaCreacion", "fechaFin", "categoria", "vinculo"}
     respuesta = Response(status=HTTPStatus.BAD_REQUEST)
@@ -90,7 +92,6 @@ def actualizar_oferta(idPublicacion):
             oferta.categoria = oferta_recibida["categoria"]
             oferta.precio = oferta_recibida["precio"]
             oferta.vinculo = oferta_recibida["vinculo"]
-
 
             oferta.obtener_autor_por_id()
             token = request.headers.get("token")
