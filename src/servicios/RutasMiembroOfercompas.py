@@ -1,4 +1,5 @@
 import json
+from http import HTTPStatus
 
 from flask import Blueprint, request, Response, session
 
@@ -108,4 +109,29 @@ def iniciar_sesion():
             respuesta = Response(status=resultado)
     else:
         respuesta = Response(status=CodigosRespuesta.MALA_SOLICITUD)
+    return respuesta
+
+
+@rutas_miembro.route("/miembros/reportes", methods=["GET"])
+def obtener_miembros_mas_denunciados():
+    respuesta = Response(CodigosRespuesta.NO_ENCONTRADO)
+    miembrosDenunciados = MiembroOfercompas.obtener_miembros_mas_denunciados()
+    if miembrosDenunciados:
+        respuesta = Response(
+            json.dumps(miembrosDenunciados),
+            status=HTTPStatus.OK,
+            mimetype="application/json"
+        )
+    return respuesta
+
+
+@rutas_miembro.route("/miembros/<id_miembro>/reporte", methods=["GET"])
+def obtener_reporte_miembro(id_miembro):
+    respuesta = Response(HTTPStatus.INTERNAL_SERVER_ERROR)
+    reporte = MiembroOfercompas.obtener_reporte(id_miembro)
+    respuesta = Response(
+        json.dumps(reporte),
+        status=HTTPStatus.OK,
+        mimetype="application/json"
+    )
     return respuesta

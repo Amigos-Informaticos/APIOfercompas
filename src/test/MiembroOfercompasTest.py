@@ -50,3 +50,8 @@ def test_iniciar_sesion():
     if miembroConSesion.idMiembro is not None and miembroConSesion.nickname is not None and miembroConSesion.tipoMiembro is not None:
         valores_llenados = True
     assert valores_llenados and respuesta == CodigosRespuesta.OK
+
+def test_obtener_reporte():
+    reporte = MiembroOfercompas.obtener_reporte(26)
+    puntuacion = reporte.get("puntuacionTotal")
+    assert puntuacion >= 0
