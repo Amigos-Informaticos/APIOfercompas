@@ -44,6 +44,19 @@ class Publicacion:
         return respuesta
 
     @staticmethod
+    def prohibir_publicacion(id_publicacion: int) -> int:
+        respuesta = 500
+        conexion = EasyConnection()
+        query = "CALL SPE_prohibirPublicacion(%s)"
+        values = [id_publicacion]
+        if conexion.send_query(query, values):
+            respuesta = 200
+        else:
+            respuesta = 400
+
+        return respuesta
+
+    @staticmethod
     def obtener_interaccion(id_miembro: int, id_publicacion: int) -> dict:
         interacciones = {}
         interacciones["puntuada"] = Puntuacion.ha_puntuado(id_miembro, id_publicacion)
