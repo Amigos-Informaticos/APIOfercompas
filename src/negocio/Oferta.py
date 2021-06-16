@@ -1,10 +1,7 @@
 from http import HTTPStatus
 
-from flask import json
-
 from src.datos.EasyConnection import EasyConnection
 from src.negocio.Publicacion import Publicacion
-from src.negocio.Puntuacion import Puntuacion
 
 
 class Oferta(Publicacion):

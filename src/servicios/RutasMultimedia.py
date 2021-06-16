@@ -5,11 +5,12 @@ from flask import Blueprint, Response, request, send_file
 
 from src.negocio.Multimedia import Multimedia
 from src.negocio.Publicacion import Publicacion
+from src.servicios.Auth import Auth
 from src.transferencia_archivos.ServidorArchivos import ServidorArchivos
 
 rutas_multimedia = Blueprint("rutas_multimedia", __name__)
 
-
+@Auth.requires_token
 @rutas_multimedia.route("/publicaciones/<idPublicacion>/multimedia", methods=["POST"])
 def publicar_archivo(idPublicacion):
     archivo = request.files.getlist("archivo")[0]
@@ -50,7 +51,7 @@ def recuperar_imagen(idPublicacion):
 
     return response
 
-
+@Auth.requires_token
 @rutas_multimedia.route("/publicaciones/<idPublicacion>/videos", methods=["GET"])
 def recuperar_video(idPublicacion):
     multimedia = Multimedia()
@@ -66,7 +67,7 @@ def recuperar_video(idPublicacion):
 
     return response
 
-
+@Auth.requires_token
 @rutas_multimedia.route("/publicaciones/<idPublicacion>/multimedia", methods=["PUT"])
 def actualizar_archivo(idPublicacion):
     archivo = request.files.getlist("archivo")[0]

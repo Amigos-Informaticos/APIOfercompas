@@ -1,9 +1,6 @@
-from http import HTTPStatus
-
 from src.datos.EasyConnection import EasyConnection
 from src.negocio.EstadoPublicacion import EstadoPublicacion
 from src.negocio.Puntuacion import Puntuacion
-from src.transferencia_archivos.ServidorArchivos import ServidorArchivos
 
 
 class Publicacion:
@@ -81,5 +78,14 @@ class Publicacion:
                 oferta_aux.obtener_puntuacion()
                 resultado.append(oferta_aux)
         return resultado
+
+    def obtener_autor_por_id(self):
+        conexion = EasyConnection()
+        query = "SELECT publicador FROM Publicacion WHERE idPublicacion = %s"
+        values = [self.idPublicacion]
+        resultado = conexion.select(query, values)
+        respuesta = resultado[0]["publicador"]
+
+        return respuesta
 
 
