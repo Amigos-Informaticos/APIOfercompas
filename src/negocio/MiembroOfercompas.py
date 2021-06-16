@@ -125,8 +125,8 @@ class MiembroOfercompas():
     def expulsar(self) -> int:
         status = CodigosRespuesta.ERROR_INTERNO
         conexion = EasyConnection()
-        query = "UPDATE MiembroOfercompas SET estado = 2 WHERE email = %s;"
-        values = [self.email]
+        query = "UPDATE MiembroOfercompas SET estado = 2 WHERE idMiembro = %s;"
+        values = [self.idMiembro]
         resultado = conexion.send_query(query, values)
         status = CodigosRespuesta.OK
         return status

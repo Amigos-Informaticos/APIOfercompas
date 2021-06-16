@@ -135,3 +135,12 @@ def obtener_reporte_miembro(id_miembro):
         mimetype="application/json"
     )
     return respuesta
+
+
+@rutas_miembro.route("/miembros/<id_miembro>/expulsion", methods=["PUT"])
+def expulsar_miembro(id_miembro):
+    miembro = MiembroOfercompas()
+    miembro.idMiembro = id_miembro
+    retorno = miembro.expulsar()
+    respuesta = Response(status= retorno)
+    return respuesta
