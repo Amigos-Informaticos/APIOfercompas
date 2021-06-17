@@ -28,9 +28,11 @@ def test_registrar():
 
 
 def test_actualizar_miembro():
+    miembro.idMiembro = 7
     miembro.nickname = "Jorge Manuel"
-    miembro.email = "jorgemanuel@gmail.com"
-    resultado = miembro.actualizar("pepsi@gmail.com")
+    miembro.email = "hola@gmail.com"
+    miembro.contrasenia = "z6SEIOxnHpiPm1aT5kKtUw=="
+    resultado = miembro.actualizar()
     assert resultado == CodigosRespuesta.OK
 
 

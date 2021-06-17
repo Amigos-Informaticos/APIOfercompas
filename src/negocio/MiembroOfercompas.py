@@ -26,6 +26,13 @@ class MiembroOfercompas():
         self.nickname = hash_miembro["nickname"]
         self.email = hash_miembro["email"]
         self.contrasenia = hash_miembro["contrasenia"]
+        self.idMiembro = hash_miembro["idMiembro"]
+
+    def instanciar_con_hashmap(self, hash_miembro: dict, id_miembro):
+        self.nickname = hash_miembro["nickname"]
+        self.email = hash_miembro["email"]
+        self.contrasenia = hash_miembro["contrasenia"]
+        self.idMiembro = id_miembro
 
     def hacer_json_token(self, token: str):
         return json.dumps({"idMiembro": int(self.idMiembro),
@@ -90,11 +97,15 @@ class MiembroOfercompas():
             registrado = CodigosRespuesta.CONFLICTO
         return registrado
 
-    def actualizar(self, old_email: str):
+    def actualizar(self):
         actualizado = CodigosRespuesta.ERROR_INTERNO
         if not self.email_registrado_actualizar():
-            query = "UPDATE MiembroOfercompas SET nickname = %s, email = %s, contrasenia = %s WHERE email = %s"
-            values = [self.nickname, self.email, self.contrasenia, old_email]
+            print(self.idMiembro)
+            print(self.nickname)
+            print(self.email)
+            print(self.contrasenia)
+            query = "UPDATE MiembroOfercompas SET nickname = %s, email = %s, contrasenia = %s WHERE idMiembro= %s"
+            values = [self.nickname, self.email, self.contrasenia, self.idMiembro]
             conexion = EasyConnection()
             conexion.send_query(query, values)
             actualizado = CodigosRespuesta.OK
@@ -108,13 +119,16 @@ class MiembroOfercompas():
         values = [self.email]
         conexion = EasyConnection()
         resultados = conexion.select(query, values)
+        print("Resultados:")
+        print(resultados)
+        print("El correo es:")
+        print(self.email)
         id_recuperado = resultados[0]["idMiembro"]
         return id_recuperado
 
     def email_registrado_actualizar(self) -> bool:
         status = False
         conexion = EasyConnection()
-        self.idMiembro = self.getId()
         query = "SELECT * FROM MiembroOfercompas WHERE email = %s AND idMiembro <> %s;"
         values = [self.email, self.idMiembro]
         resultado = conexion.select(query, values)

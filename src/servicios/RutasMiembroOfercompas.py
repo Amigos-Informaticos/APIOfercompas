@@ -36,18 +36,18 @@ def registrar_miembro():
     return respuesta
 
 
-@rutas_miembro.route("/miembros/<old_email>", methods=["PUT"])
-@Auth.requires_token
-@Auth.requires_role(TipoMiembro.COMUN)
-def actualizar_miembro(old_email):
+@rutas_miembro.route("/miembros/<id_miembro>", methods=["PUT"])
+#"@Auth.requires_token
+def actualizar_miembro(id_miembro):
     valores_requeridos = {"email", "nickname", "contrasenia"}
     miembro_recibido = request.json
+    print(request.headers.get("token"))
     print(miembro_recibido)
     respuesta = Response(CodigosRespuesta.MALA_SOLICITUD)
     if all(llave in miembro_recibido for llave in valores_requeridos):
         miembro = MiembroOfercompas()
-        miembro.instanciar_con_hashmap(miembro_recibido)
-        resultado = miembro.actualizar(old_email)
+        miembro.instanciar_con_hashmap(miembro_recibido, id_miembro)
+        resultado = miembro.actualizar()
         if resultado == CodigosRespuesta.OK:
             respuesta = Response(
                 miembro.hacer_json(),
