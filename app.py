@@ -15,6 +15,7 @@ app.register_blueprint(rutas_miembro)
 app.register_blueprint(rutas_oferta)
 app.register_blueprint(rutas_publicacion)
 app.register_blueprint(rutas_codigo)
+app.register_blueprint(rutas_multimedia)
 app.config["SECRET_KEY"] = "beethoven"
 app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(minutes=120)
 

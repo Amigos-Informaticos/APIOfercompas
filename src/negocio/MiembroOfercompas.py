@@ -152,7 +152,7 @@ class MiembroOfercompas():
         query = "SELECT nickname, idMiembro, denuncias FROM MiembroOfercompas INNER JOIN" \
                 " (SELECT publicador, COUNT(idPublicacion) AS denuncias FROM Publicacion WHERE" \
                 " numeroDenuncias > 0 GROUP BY publicador ORDER BY COUNT(idPublicacion) DESC LIMIT 10)" \
-                " AS DENUNCIAS ON idMiembro = DENUNCIAS.publicador;"
+                " AS DENUNCIAS ON idMiembro = DENUNCIAS.publicador WHERE estado = 1;"
         conexion = EasyConnection()
         resultado = conexion.select(query)
         return resultado
