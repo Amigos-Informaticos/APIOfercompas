@@ -51,7 +51,7 @@ def recuperar_imagen(idPublicacion):
 
     return response
 
-@Auth.requires_token
+
 @rutas_multimedia.route("/publicaciones/<idPublicacion>/videos", methods=["GET"])
 def recuperar_video(idPublicacion):
     multimedia = Multimedia()
