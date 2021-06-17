@@ -26,7 +26,12 @@ class CodigoDescuento(Publicacion):
         query = "CALL SPI_registrarCodigoDescuento (%s, %s, %s, %s, %s, %s, %s)"
         values = [self.titulo, self.descripcion, self.fechaCreacion, self.fechaFin, self.categoria,
                   self.codigo, self.publicador]
-        if conexion.send_query(query, values):
+        resultado = conexion.select(query, values)
+        print("caca")
+        print(resultado)
+
+        if resultado:
+            self.idPublicacion = resultado[0]["idPublicacion"]
             respuesta = HTTPStatus.CREATED
         else:
             respuesta = 400

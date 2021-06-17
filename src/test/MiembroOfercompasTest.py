@@ -30,7 +30,7 @@ def test_registrar():
 def test_actualizar_miembro():
     miembro.nickname = "Jorge Manuel"
     miembro.email = "jorgemanuel@gmail.com"
-    resultado = miembro.actualizar("holaGGG@gmail.com")
+    resultado = miembro.actualizar("pepsi@gmail.com")
     assert resultado == CodigosRespuesta.OK
 
 
