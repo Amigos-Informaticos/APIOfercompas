@@ -71,9 +71,7 @@ def actualizar_codigo(idPublicacion):
             if Auth.verificar_autor(codigo_descuento.obtener_autor_por_id(), token):
                 if status == HTTPStatus.OK:
                     respuesta = Response(
-                        json.dumps(codigo_descuento.convertir_a_json(
-                            ["idPublicacion", "titulo", "descripcion", "codigo", "fechaCreacion", "fechaFin",
-                             "categoria"])),
+                        json.dumps(codigo_descuento.convertir_a_json()),
                         status=status,
                         mimetype="application/json"
                     )
@@ -88,7 +86,6 @@ def actualizar_codigo(idPublicacion):
 
 
 @rutas_codigo.route("/codigos", methods=["GET"])
-@Auth.requires_token
 def obtener_codigo():
     pagina = request.args.get("pagina", default=1, type=int)
     categoria = request.args.get("categoria", default=-1, type=int)

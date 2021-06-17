@@ -9,7 +9,6 @@ from src.servicios.Auth import Auth
 
 rutas_miembro = Blueprint("rutas_miembro", __name__)
 
-
 @rutas_miembro.route("/miembros", methods=["POST"])
 def registrar_miembro():
     miembro_recibido = request.json
@@ -111,9 +110,10 @@ def iniciar_sesion():
         respuesta = Response(status=CodigosRespuesta.MALA_SOLICITUD)
     return respuesta
 
+
+@rutas_miembro.route("/miembros/reportes", methods=["GET"])
 @Auth.requires_token
 @Auth.requires_role(TipoMiembro.MODERADOR)
-@rutas_miembro.route("/miembros/reportes", methods=["GET"])
 def obtener_miembros_mas_denunciados():
     respuesta = Response(CodigosRespuesta.NO_ENCONTRADO)
     miembrosDenunciados = MiembroOfercompas.obtener_miembros_mas_denunciados()
@@ -126,9 +126,9 @@ def obtener_miembros_mas_denunciados():
     return respuesta
 
 
+@rutas_miembro.route("/miembros/<id_miembro>/reporte", methods=["GET"])
 @Auth.requires_token
 @Auth.requires_role(TipoMiembro.MODERADOR)
-@rutas_miembro.route("/miembros/<id_miembro>/reporte", methods=["GET"])
 def obtener_reporte_miembro(id_miembro):
     respuesta = Response(HTTPStatus.INTERNAL_SERVER_ERROR)
     reporte = MiembroOfercompas.obtener_reporte(id_miembro)
@@ -139,9 +139,10 @@ def obtener_reporte_miembro(id_miembro):
     )
     return respuesta
 
+
+@rutas_miembro.route("/miembros/<id_miembro>/expulsion", methods=["PUT"])
 @Auth.requires_token
 @Auth.requires_role(TipoMiembro.MODERADOR)
-@rutas_miembro.route("/miembros/<id_miembro>/expulsion", methods=["PUT"])
 def expulsar_miembro(id_miembro):
     miembro = MiembroOfercompas()
     miembro.idMiembro = id_miembro
