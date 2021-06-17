@@ -30,14 +30,13 @@ def eliminar_publicacion(idPublicacion):
 
     return Response(status=status)
 
+
 @rutas_publicacion.route("/publicaciones/<idPublicacion>/prohibir", methods=["DELETE"])
 @Auth.requires_token
 @Auth.requires_role(TipoMiembro.MODERADOR)
 def prohibir_publicacion(idPublicacion):
     status = Publicacion.prohibir_publicacion(idPublicacion)
-    return Response(status = status)
-
-
+    return Response(status=status)
 
 
 @rutas_publicacion.route("/publicaciones/<idPublicacion>/puntuaciones", methods=["POST"])
@@ -58,7 +57,6 @@ def puntuar_publicacion(idPublicacion):
             else:
                 respuesta = Response(status=resultado)
     return respuesta
-
 
 
 @rutas_publicacion.route("/publicaciones/<idPublicacion>/interaccion", methods=["GET"])
@@ -113,7 +111,6 @@ def obtener_comentarios(id_publicacion):
         else:
             respuesta = Response(status=HTTPStatus.NOT_FOUND)
     return respuesta
-
 
 
 @rutas_publicacion.route("/publicaciones/<id_publicacion>/denuncias", methods=["POST"])

@@ -81,34 +81,6 @@ paths:
                 schema:
                   $ref: '#/components/schemas/OfertaSchema'
 
-  /ofertas/{id_oferta}:
-    description: Una oferta identificada por su id
-    get:
-      summary: Devuelve los detalles de una oferta específica
-      tags:
-        - Ofertas
-      operationId: getOferta
-      parameters:
-        - name: id_oferta
-          description: El id de la oferta
-          in: path
-          schema:
-            type: integer
-            format: int32
-            minimum: 1
-          required: true
-      responses:
-        '200':
-          description: Una representación JSON de una oferta
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/OfertaSchema'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '404':
-          $ref: '#/components/responses/NotFound'
-
     put:
       summary: Actualiza una oferta existente
       tags:
@@ -138,13 +110,45 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
 
-    patch:
-      summary: Elimina una oferta existente
+
+  /publicaciones/{idPublicacion}/puntuaciones:
+    post:
+      summary: Puntúa una Publicación
       tags:
-        - Ofertas
+        - Publicaciones
+      operationId: postPuntuacion
       parameters:
-        - name: id_oferta
-          description: El id de la oferta
+        - name: id_publicacion
+          description: El id de la publicacion
+          in: path
+          schema:
+            type: integer
+            format: int32
+            minimum: 1
+          required: true
+      requestBody:
+        content:
+          application/json:
+            schema:
+                $ref: '#/components/schemas/PuntuacionSchema'
+      responses:
+        '201':
+          description: Una representación JSON de la oferta creada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OfertaSchema'
+
+
+
+  /publicaciones/{id_publicacion}:
+    delete:
+      summary: Elimina una publicación existente
+      tags:
+        - Publicaciones
+      parameters:
+        - name: id_publicacion
+          description: El id de la publicacion
           in: path
           schema:
             type: integer
@@ -152,52 +156,234 @@ paths:
             minimum: 1
           required: true
       responses:
-        '204':
+        '200':
           description: El recurso se eliminó con éxito
         '400':
           $ref: '#/components/responses/BadRequest'
         '404':
           $ref: '#/components/responses/NotFound'
 
-
-  /publicaciones/{id_publicacion}/denuncias:
-    description: Accede al catálogo
-    get:
-      summary: Trae las 10 denuncias correspondientes al número de página
+  /publicaciones/{id_publicacion}/prohibir:
+    delete:
+      summary: Prohibe una publicación considerada inadecuada
       tags:
-        - Denuncias
-      operationId: getDenuncias
+        - Publicaciones
       parameters:
         - name: id_publicacion
-          description: El id de la oferta
+          description: El id de la publicacion
           in: path
           schema:
             type: integer
             format: int32
+            minimum: 1
           required: true
-          example: 5
-        - name:  numeroPagina
-          description: El número de página que indica si traerá los primeros 10 en caso de ser 1
-          in: query
-          schema:
-            type: integer
-            format: int32
-          required: true
-          example: 4
       responses:
         '200':
-          description: Se han encontrado denuncias
-          content:
-            application/json:
-              schema:
-                description: Un arreglo de denuncias
-                type: array
-                items:
-                  $ref: '#/components/schemas/DenunciaSchema'
+          description: El recurso se prohibió con éxito
         '400':
           $ref: '#/components/responses/BadRequest'
         '404':
           $ref: '#/components/responses/NotFound'
+
+
+
+
+
+
+  /publicaciones/{id_publicacion}/denuncias:
+    post:
+      summary: Publica una denuncia hacia una publicación
+      tags:
+        - Denuncias
+      operationId: postDenuncia
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DenunciaSchema'
+        required: true
+      responses:
+        '201':
+          description: Una representación JSON del codigo publicado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DenunciaSchema'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+
+  /publicaciones/{id_publicacion}/comentarios:
+    description: Los comentarios de una publicación según su id
+    get:
+      summary: Obtiene todos los comentarios de una oferta
+      tags:
+        - Comentarios
+      operationId: getComentarios
+      parameters:
+          - name: id_publicacion
+            description: El id de la publicacion
+            in: path
+            schema:
+              type: integer
+              format: int32
+              minimum: 1
+            required: true
+      responses:
+        '200':
+          description: Se han encontrado códigos
+          content:
+            application/json:
+              schema:
+                description: Un arreglo de comentarios
+                type: array
+                items:
+                  $ref: '#/components/schemas/ComentarioSchema'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    post:
+      summary: Publica un comentario en una publicacion
+      tags:
+        - Comentarios
+      operationId: postComentario
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ComentarioSchema'
+            required: true
+      responses:
+        '201':
+          description: Una representación JSON del codigo publicado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ComentarioSchema'
+
+
+  /publicaciones/{idPublicacion}/multimedia:
+    post:
+      summary: Carga un archivo y lo asocia a una Oferta
+      tags:
+        - Multimedia
+      operationId: postComentario
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: array
+                  items:
+                    type: string
+                    format: binary
+      parameters:
+        - in: path
+          name: idPublicacion
+          description: El id del codigo
+          schema:
+            type: integer
+            format: int32
+          required: true
+      responses:
+        '201':
+          description: Achivo carado correctamente
+        '400':
+          $ref: '#/components/responses/BadRequest'
+
+  /publicaciones/{idPublicacion}/imagenes:
+    get:
+      summary: Retorna la imagen asociada a esa Oferta
+      tags:
+        - Multimedia
+      parameters:
+        - name: idOferta
+          description: Id del miembro
+          example: 4
+          in: path
+          schema:
+            type: integer
+            format: int32
+            minimum: 1
+          required: true
+      responses:
+        '200':
+          description: Imagen recuperada
+          content:
+            application/png:
+              schema:
+                type: string
+                format: binary
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /publicaciones/{idPublicacion}/videos:
+    get:
+      summary: Retorna el video asociado a una Oferta
+      tags:
+        - Multimedia
+      parameters:
+        - name: idOferta
+          description: Id del miembro
+          example: 4
+          in: path
+          schema:
+            type: integer
+            format: int32
+            minimum: 1
+          required: true
+      responses:
+        '200':
+          description: Video recuperada
+          content:
+            application/mp4:
+              schema:
+                type: string
+                format: binary
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    put:
+      summary: Actualiza un archivo
+      tags:
+        - Multimedia
+      operationId: putMultimedia
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: array
+                  items:
+                    type: string
+                    format: binary
+      parameters:
+        - in: path
+          name: idPublicacion
+          description: El id del codigo
+          schema:
+            type: integer
+            format: int32
+          required: true
+      responses:
+        '201':
+          description: Achivo carado correctamente
+        '400':
+          $ref: '#/components/responses/BadRequest'
+
+
+
+
+
 
   /codigos:
     post:
@@ -221,45 +407,50 @@ paths:
         '400':
           $ref: '#/components/responses/BadRequest'
 
-  /publicaciones:
-    post:
-      summary: Publica un comentario en una publicacion
+    get:
+      summary: Devuelve una lista de Códigos de descuento
       tags:
-        - Publicaciones
-      operationId: postComentario
-      requestBody:
+        - Codigos
+      operationId: getCodigos
+      parameters:
+        - name: numeroPagina
+          in: query
+          required: false
+          example: 35
+          schema:
+            type: integer
+            format: int32
+            minimum: 1
+        - name: categoria
+          in: query
+          required: false
+          example: TECNOLOGIA
+          schema:
+            type: string
+            minLength: 1
+            maxLength: 20
+      responses:
+        '200':
+          description: Se han encontrado códigos
+          content:
+            application/json:
+              schema:
+                description: Un arreglo de códigos
+                type: array
+                items:
+                  $ref: '#/components/schemas/CodigoDescuentoSchema'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
 
 
 
 
 
   /codigos/{id_Codigo}:
-      description: Un codigo identificado por su id
-      get:
-        summary: Devuelve los detalles de un codigo
-        tags:
-          - Codigos
-        operationId: getCodigo
-        parameters:
-          - name: id_Codigo
-            description: El id del codigo
-            in: path
-            schema:
-              type: integer
-              format: int32
-              minimum: 1
-            required: true
-        responses:
-          '200':
-            description: Una representación JSON del codigo
-            content:
-              application/json:
-                schema:
-                  $ref: '#/components/schemas/CodigoDescuentoSchema'
-          '400':
-            $ref: '#/components/responses/BadRequest'
-          '404':
-            $ref: '#/components/responses/NotFound'
+
 
       put:
         summary: Actualiza un codigo de descuento existente
@@ -281,7 +472,7 @@ paths:
                 $ref: '#/components/schemas/CodigoDescuentoSchema'
         responses:
           '200':
-            description: Una representación JSON de una oferta
+            description: Una representación JSON de un código de descuento
             content:
               application/json:
                 schema:
@@ -289,26 +480,8 @@ paths:
           '404':
             $ref: '#/components/responses/NotFound'
 
-      patch:
-        summary: Desactiva un codigo de descuento
-        tags:
-          - Codigos
-        parameters:
-          - name: id_Codigo
-            description: El id del codigo
-            in: path
-            schema:
-              type: integer
-              format: int32
-              minimum: 1
-            required: true
-        responses:
-          '204':
-            description: El recurso se eliminó con éxito
-          '400':
-            $ref: '#/components/responses/BadRequest'
-          '404':
-            $ref: '#/components/responses/NotFound'
+
+
 
 
 
@@ -323,7 +496,7 @@ paths:
     post:
       summary: Registra un miembroOfercompas en la comunidad
       tags:
-        - Ofertas
+        - Miembros
       requestBody:
         description: Un miembro Ofercompas
         required: true
@@ -401,7 +574,7 @@ paths:
           $ref: '#/components/responses/NotFound'
 
 
-    patch:
+    delete:
       summary: Cambia el atributo estado de un miembroOfercompas a eliminado
       tags:
         - Miembros
@@ -633,6 +806,17 @@ components:
           description: Contenido del comentario hecho a la publicación
           example: Excelente oderta, aprovechen!
 
-
-
-
+    PuntuacionSchema:
+      type: object
+      required:
+        - id_puntuador
+        - id_publicacion
+      properties:
+        id_puntuador:
+          type: integer
+          description: Identificador de quién puntuó
+          example: 7
+        id_publicacion:
+          type: integer
+          description: Identificador de quién puntuó
+          example: 7

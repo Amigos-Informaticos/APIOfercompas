@@ -10,9 +10,11 @@ from src.transferencia_archivos.ServidorArchivos import ServidorArchivos
 
 rutas_multimedia = Blueprint("rutas_multimedia", __name__)
 
-@Auth.requires_token
+
 @rutas_multimedia.route("/publicaciones/<idPublicacion>/multimedia", methods=["POST"])
+@Auth.requires_token
 def publicar_archivo(idPublicacion):
+    print(request.files)
     archivo = request.files.getlist("archivo")[0]
     respuesta = Response(status=HTTPStatus.BAD_REQUEST)
     multimedia = Multimedia()
@@ -51,7 +53,7 @@ def recuperar_imagen(idPublicacion):
 
     return response
 
-@Auth.requires_token
+
 @rutas_multimedia.route("/publicaciones/<idPublicacion>/videos", methods=["GET"])
 def recuperar_video(idPublicacion):
     multimedia = Multimedia()
@@ -67,8 +69,9 @@ def recuperar_video(idPublicacion):
 
     return response
 
-@Auth.requires_token
+
 @rutas_multimedia.route("/publicaciones/<idPublicacion>/multimedia", methods=["PUT"])
+@Auth.requires_token
 def actualizar_archivo(idPublicacion):
     archivo = request.files.getlist("archivo")[0]
     respuesta = Response(status=HTTPStatus.BAD_REQUEST)
