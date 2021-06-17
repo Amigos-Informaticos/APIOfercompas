@@ -1,13 +1,17 @@
+import io
 import json
 from http import HTTPStatus
 
-from flask import Blueprint, Response, request
+from flask import Blueprint, Response, request, send_file
 
+from src.negocio import TipoMiembro
 from src.negocio.Comentario import Comentario
 from src.negocio.Denuncia import Denuncia
+from src.negocio.Oferta import Oferta
 from src.negocio.Publicacion import Publicacion
 from src.negocio.Puntuacion import Puntuacion
 from src.servicios.Auth import Auth
+from src.transferencia_archivos.ServidorArchivos import ServidorArchivos
 
 rutas_publicacion = Blueprint("rutas_publicacion", __name__)
 
@@ -25,6 +29,15 @@ def eliminar_publicacion(idPublicacion):
         status = HTTPStatus.UNAUTHORIZED
 
     return Response(status=status)
+
+@rutas_publicacion.route("/publicaciones/<idPublicacion>/prohibir", methods=["DELETE"])
+@Auth.requires_token
+@Auth.requires_role(TipoMiembro.MODERADOR)
+def prohibir_publicacion(idPublicacion):
+    status = Publicacion.prohibir_publicacion(idPublicacion)
+    return Response(status = status)
+
+
 
 
 @rutas_publicacion.route("/publicaciones/<idPublicacion>/puntuaciones", methods=["POST"])

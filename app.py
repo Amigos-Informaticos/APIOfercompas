@@ -4,8 +4,6 @@ from flask import Flask
 from flask_cors import CORS
 
 from src.servicios.RutasCodigoDescuento import rutas_codigo
-from src.servicios.RutasComentario import rutas_comentario
-from src.servicios.RutasDenuncia import rutas_denuncia
 from src.servicios.RutasMiembroOfercompas import rutas_miembro
 from src.servicios.RutasMultimedia import rutas_multimedia
 from src.servicios.RutasOferta import rutas_oferta
@@ -17,9 +15,6 @@ app.register_blueprint(rutas_miembro)
 app.register_blueprint(rutas_oferta)
 app.register_blueprint(rutas_publicacion)
 app.register_blueprint(rutas_codigo)
-app.register_blueprint(rutas_denuncia)
-app.register_blueprint(rutas_comentario)
-app.register_blueprint(rutas_multimedia)
 app.config["SECRET_KEY"] = "beethoven"
 app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(minutes=120)
 
