@@ -37,7 +37,6 @@ def registrar_miembro():
 
 
 @rutas_miembro.route("/miembros/<id_miembro>", methods=["PUT"])
-#"@Auth.requires_token
 def actualizar_miembro(id_miembro):
     valores_requeridos = {"email", "nickname", "contrasenia"}
     miembro_recibido = request.json
