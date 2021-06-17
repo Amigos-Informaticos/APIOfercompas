@@ -111,7 +111,8 @@ def iniciar_sesion():
         respuesta = Response(status=CodigosRespuesta.MALA_SOLICITUD)
     return respuesta
 
-
+@Auth.requires_token
+@Auth.requires_role(TipoMiembro.MODERADOR)
 @rutas_miembro.route("/miembros/reportes", methods=["GET"])
 def obtener_miembros_mas_denunciados():
     respuesta = Response(CodigosRespuesta.NO_ENCONTRADO)
@@ -125,6 +126,8 @@ def obtener_miembros_mas_denunciados():
     return respuesta
 
 
+@Auth.requires_token
+@Auth.requires_role(TipoMiembro.MODERADOR)
 @rutas_miembro.route("/miembros/<id_miembro>/reporte", methods=["GET"])
 def obtener_reporte_miembro(id_miembro):
     respuesta = Response(HTTPStatus.INTERNAL_SERVER_ERROR)
@@ -136,7 +139,8 @@ def obtener_reporte_miembro(id_miembro):
     )
     return respuesta
 
-
+@Auth.requires_token
+@Auth.requires_role(TipoMiembro.MODERADOR)
 @rutas_miembro.route("/miembros/<id_miembro>/expulsion", methods=["PUT"])
 def expulsar_miembro(id_miembro):
     miembro = MiembroOfercompas()
