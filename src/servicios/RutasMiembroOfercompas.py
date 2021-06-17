@@ -9,7 +9,6 @@ from src.servicios.Auth import Auth
 
 rutas_miembro = Blueprint("rutas_miembro", __name__)
 
-
 @rutas_miembro.route("/miembros", methods=["POST"])
 def registrar_miembro():
     miembro_recibido = request.json
